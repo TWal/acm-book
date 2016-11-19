@@ -10,7 +10,7 @@
 #define mt make_tuple
 #define pb push_back
 
-//------------------------------------------------------------------------------
+
 
 using namespace std;
 using lli = long long int;
@@ -26,7 +26,7 @@ using vviii = vector<viii>;
 using vb    = vector<bool>;
 using vvb   = vector<vb>;
 
-//------------------------------------------------------------------------------
+
 
 template<class A, class B>
 ostream& operator<<(ostream& s, tuple<A, B> const& a){
@@ -42,6 +42,10 @@ ostream& print_collection(ostream& s, T const& a){
 }
 
 template<class T>
-ostream& operator<<(ostream& s, vector<T> const& a) { return print_collection(a); }
+ostream& operator<<(ostream& s, vector<T> const& a) {
+    return print_collection(s, a);
+}
 template<class T>
-ostream& operator<<(ostream& s, set<T> const& a) { return print_collection(a); }
+ostream& operator<<(ostream& s, set<T> const& a) {
+    return print_collection(s, a);
+}
