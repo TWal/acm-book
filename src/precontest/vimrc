@@ -1,0 +1,21 @@
+syntax on
+filetype plugin on
+set colorcolumn=80 "cc
+set background=dark
+set number "nu
+set tabstop=4 "ts
+set shiftwidth=4 "sw
+set noexpandtab "noet
+set smartindent "si
+set hlsearch " Highlight search, hls
+set incsearch " Incremental search, is
+set ttimeoutlen=100 " Don't wait when doing <Esc>O, ttm
+set scrolloff=5 " 5 line above / below the cursor when scrolling, so
+set cursorline " Highlight where the cursor is, cul
+xnoremap < <gv
+xnoremap > >gv
+noremap 0 ^
+noremap ^ 0
+nnoremap ZW :w<cr>
+nnoremap ZT :tabe 
+nnoremap Y y$

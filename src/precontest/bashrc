@@ -1,0 +1,7 @@
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias run='./a.out < sample.in'
+alias t='setxkbmap -option "" -option compose:ralt -option caps:swapescape us'
+alias T='setxkbmap -option "" -option ctrl:nocaps us dvorak'
+alias f='setxkbmap -option "" -option ctrl:nocaps fr'
+export PATH="~/bin/:$PATH"

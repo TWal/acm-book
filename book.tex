@@ -1,0 +1,76 @@
+\documentclass[landscape,a4paper,twocolumn,10pt]{report}
+
+% \usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{amsmath,amssymb,listings,array,fancyhdr,lastpage}
+\usepackage[landscape,pdftex,top=1.5cm,bottom=0.5cm,left=0.475cm,right=0.475cm]{geometry}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\lstset{
+  language=C++,
+  morekeywords=
+  { lli, llu, pii, piii, vi, vii, viii, vvi, vvii, vviii,
+    pt, FOR, FORU, FORD
+  },
+  basicstyle=\ttfamily,
+  keywordstyle=\color{blue}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  commentstyle=\color{dkgreen}\ttfamily,
+  morecomment=[l][\color{magenta}]{\#}
+}
+
+\setlength{\columnsep}{15pt}
+\setlength{\columnseprule}{1pt}
+\setlength{\headsep}{0.1cm}
+\setlength{\footskip}{0cm}
+
+\pagestyle{fancy}
+\chead{\'Ecole Normale Sup\'erieure ULM}
+\lhead{\textit{\small{}ENS Ulm 3}}
+\rhead{\thepage{} of~\pageref{LastPage}}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+\renewcommand{\headrulewidth}{0.1pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\begin{document}
+
+\footnotesize
+
+\noindent
+Pre-contest: page \pageref{precontest} \\
+Math: page \pageref{math}
+
+
+
+\subsection*{Pre-contest}
+\label{precontest}
+
+\subsubsection{.vimrc}
+\lstinputlisting[language={}]{src/precontest/vimrc}
+
+\subsubsection*{.bashrc}
+\lstinputlisting[language=bash]{src/precontest/bashrc}
+
+\subsubsection*{binaries}
+\lstinputlisting[language=bash]{src/precontest/make_binaries.sh}
+
+\subsubsection{template.cpp}
+\lstinputlisting{src/precontest/template.cpp}
+
+
+
+\subsection*{Math}
+\label{math}
+
+\subsubsection{Extended GCD - $O(\log(\min(a, b)))$}
+\lstinputlisting{src/math/egcd.cpp}
+
+
+
+\label{LastPage}
+
+\end{document}

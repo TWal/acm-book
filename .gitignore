@@ -1,0 +1,11 @@
+*.aux
+*.log
+*.toc
+*.pdf
+*.
+tests/bin
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+compile_commands.json
+tests/Makefile
