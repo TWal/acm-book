@@ -8,6 +8,7 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 set(${PROJECT_NAME}_SOURCES
     src/main.cpp
     src/math.cpp
+    src/string.cpp
 )
 add_subdirectory("rapidcheck")
 
