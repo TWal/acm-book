@@ -1,4 +1,5 @@
-The algorithms are adapted from source code we found online.
+Most of the algorithms are adapted from source code we found online.
 
 math/egcd.cpp: wikipedia
 string/kmp.cpp: http://www.iti.fh-flensburg.de/lang/algorithmen/pattern/kmpen.htm
+string/zfunc.cpp: https://github.com/stjepang/snippets

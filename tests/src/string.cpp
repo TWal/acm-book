@@ -1,5 +1,6 @@
 #include <precontest/template.cpp>
 #include <string/kmp.cpp>
+#include <string/zfunc.cpp>
 #include <rapidcheck.h>
 
 //Generates a "binary" string because it is more interesting to test
@@ -51,6 +52,26 @@ void testString() {
         kmpSearch(b, p, t, [&](lli i) { res[i] = true; });
         FOR(i, res.size()) {
             RC_ASSERT((t.substr(i, p.size()) == p) == res[i]);
+        }
+    });
+
+    rc::check("s[i..i+z[i]] is a prefix of s", []() {
+        string s = *getString();
+        RC_PRE(s.size() > 0);
+        vi z = zfunc(s);
+        for(lli i = 0; i < (lli)s.size(); ++i) {
+            RC_ASSERT(s.substr(0, z[i]) == s.substr(i, z[i]));
+        }
+    });
+
+    rc::check("z[i] is maximum", []() {
+        string s = *getString();
+        RC_PRE(s.size() > 0);
+        vi z = zfunc(s);
+        for(lli i = 0; i < (lli)s.size(); ++i) {
+            if(i+z[i] < s.size()) {
+                RC_ASSERT(s[z[i]] != s[i+z[i]]);
+            }
         }
     });
 }
