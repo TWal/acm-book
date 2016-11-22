@@ -1,4 +1,4 @@
-//z[i] = length of longest sustring starting at s[i] which is also a prefix of s
+//z[i] = length of longest common prefix of `s` and `s[i:]`
 vi zfunc(const string& s) {
     lli l = -1, r = -1, n = s.size();
     vi z(n, n);

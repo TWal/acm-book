@@ -1,4 +1,4 @@
-//p is the needle, returns the maximum border (proper prefix&suffix) of p[0..i]
+//p is the needle, returns the maximum border (proper prefix&suffix) of p[0:i]
 vi kmpPreprocess(const string& p) {
     lli i = 0, j = -1;
     vi b(p.size()+1, 0);
