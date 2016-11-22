@@ -22,6 +22,7 @@ void testMath() {
         vi a = *vigen.as("a");
         vi b = *vigen.as("c");
         vi c = polymult(a, b);
+        RC_ASSERT(c.size() >= a.size() + b.size());
         FOR(n, c.size()) {
             lli cur = 0;
             for(lli k = 0; k <= n; ++k) {
