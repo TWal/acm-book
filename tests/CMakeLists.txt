@@ -9,6 +9,7 @@ set(${PROJECT_NAME}_SOURCES
     src/main.cpp
     src/math.cpp
     src/string.cpp
+    src/datastruct.cpp
 )
 add_subdirectory("rapidcheck")
 
