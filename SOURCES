@@ -6,3 +6,4 @@ string/kmp.cpp: http://www.iti.fh-flensburg.de/lang/algorithmen/pattern/kmpen.ht
 string/zfunc.cpp: https://github.com/stjepang/snippets/blob/master/z_algorithm.cpp
 datastruct/unionfind.cpp: wikipedia, complexity from http://stackoverflow.com/a/2326676
 datastruct/fenwick.cpp: wikipedia
+datastruct/segmenttree.cpp: http://codeforces.com/blog/entry/18051

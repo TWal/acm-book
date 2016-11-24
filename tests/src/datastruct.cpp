@@ -1,6 +1,7 @@
 #include <precontest/template.cpp>
 #include <datastruct/unionfind.cpp>
 #include <datastruct/fenwick.cpp>
+#include <datastruct/segtree.cpp>
 #include <rapidcheck.h>
 
 //Slow union-find without any optimization so it works
@@ -34,6 +35,21 @@ struct DummyBIT {
     }
     void add(lli k, lli val) {
         v[k] += val;
+    }
+};
+
+struct DummySegTree {
+    vi v;
+    DummySegTree(const vi& vals) : v(vals) {}
+    void modify(lli p, lli val) {
+        v[p] = val;
+    }
+    lli query(lli l, lli r) {
+        lli res = 0;
+        for(lli i = l; i < r; ++i) {
+            res += v[i];
+        }
+        return res;
     }
 };
 
@@ -79,6 +95,29 @@ void testDatastruct() {
                 bit.add(k, v);
                 dbit.add(k, v);
             }
+        }
+    });
+
+    rc::check("segment tree works", []() {
+        vi vals = *rc::gen::arbitrary<vi>().as("vals");
+        SegTree st = SegTree(vals);
+        DummySegTree dst = DummySegTree(vals);
+
+        vii lr = *rc::gen::container<vii>(rc::gen::tuple(rc::gen::inRange(0, (int)vals.size()), rc::gen::inRange(0, (int)vals.size()))).as("lr");
+        vii updates = *rc::gen::container<vii>(lr.size(), rc::gen::tuple(rc::gen::inRange(0, (int)vals.size()), rc::gen::arbitrary<lli>())).as("updates");
+        for(pii& t : lr) {
+            if(X(t) > Y(t)) {
+                t = mt(Y(t), X(t));
+            }
+        }
+
+        FOR(i, lr.size()) {
+            lli l, r, idx, v;
+            tie(l, r) = lr[i];
+            tie(idx, v) = updates[i];
+            st.modify(idx, v);
+            dst.modify(idx, v);
+            RC_ASSERT(st.query(l, r) == dst.query(l, r));
         }
     });
 }
