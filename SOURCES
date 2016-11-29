@@ -4,6 +4,7 @@ math/egcd.cpp: wikipedia
 math/fft.cpp: http://rosettacode.org/wiki/Fast_Fourier_transform#C.2B.2B
 string/kmp.cpp: http://www.iti.fh-flensburg.de/lang/algorithmen/pattern/kmpen.htm
 string/zfunc.cpp: https://github.com/stjepang/snippets/blob/master/z_algorithm.cpp
+string/ahocorasick: original paper (http://cr.yp.to/bib/1975/aho.pdf)
 datastruct/unionfind.cpp: wikipedia, complexity from http://stackoverflow.com/a/2326676
 datastruct/fenwick.cpp: wikipedia
 datastruct/segmenttree.cpp: http://codeforces.com/blog/entry/18051

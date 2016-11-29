@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 
 #define FOR(i, n) for(lli i = 0; i < (lli)(n); ++i)
+#define ALL(x) (x).begin(), (x).end()
 
 #define X(A) get<0>(A)
 #define Y(A) get<1>(A)
