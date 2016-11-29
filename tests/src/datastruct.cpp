@@ -54,7 +54,7 @@ struct DummySegTree {
 };
 
 void testDatastruct() {
-    rc::check("union-find works", []() {
+    rc::check("unionfind: union-find works", []() {
         const int size = *rc::gen::withSize([](int n) { return rc::gen::just(n); });
         RC_PRE(size >= 1);
         UF uf = UF(size);
@@ -76,7 +76,7 @@ void testDatastruct() {
         }
     });
 
-    rc::check("fenwick tree works", []() {
+    rc::check("fenwick: fenwick tree works", []() {
         const int size = *rc::gen::withSize([](int n) { return rc::gen::just(n); });
         RC_PRE(size >= 1);
         BIT bit = BIT(size);
@@ -98,7 +98,7 @@ void testDatastruct() {
         }
     });
 
-    rc::check("segment tree works", []() {
+    rc::check("segtree: segment tree works", []() {
         vi vals = *rc::gen::arbitrary<vi>().as("vals");
         SegTree st = SegTree(vals);
         DummySegTree dst = DummySegTree(vals);

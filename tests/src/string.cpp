@@ -31,7 +31,7 @@ static bool isSuffix(const string& big, const string& small) {
 }
 
 void testString() {
-    rc::check("kmpPreprocess(p)[i] is a border of p[0..i]", []() {
+    rc::check("kmp: kmpPreprocess(p)[i] is a border of p[0..i]", []() {
         string p = *getString().as("needle");
         RC_PRE(p.size() > 0);
         vi b = kmpPreprocess(p);
@@ -41,7 +41,7 @@ void testString() {
         }
     });
 
-    rc::check("kmpPreprocess(p)[i] is maximum", []() {
+    rc::check("kmp: kmpPreprocess(p)[i] is maximum", []() {
         string p = *getString().as("needle");
         RC_PRE(p.size() > 0);
         vi b = kmpPreprocess(p);
@@ -53,7 +53,7 @@ void testString() {
         }
     });
 
-    rc::check("kmpSearch finds the substrings", []() {
+    rc::check("kmp: kmpSearch finds the substrings", []() {
         string t = *getString().as("haystack");
         string p = *rc::gen::scale(0.3, getString()).as("needle");
         RC_PRE(p.size() > 0);
@@ -68,7 +68,7 @@ void testString() {
         }
     });
 
-    rc::check("s[i..i+z[i]] is a prefix of s", []() {
+    rc::check("zfunc: s[i..i+z[i]] is a prefix of s", []() {
         string s = *getString();
         RC_PRE(s.size() > 0);
         vi z = zfunc(s);
@@ -77,7 +77,7 @@ void testString() {
         }
     });
 
-    rc::check("z[i] is maximum", []() {
+    rc::check("zfunc: z[i] is maximum", []() {
         string s = *getString();
         RC_PRE(s.size() > 0);
         vi z = zfunc(s);
