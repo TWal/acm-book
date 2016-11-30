@@ -38,16 +38,17 @@ struct DummyBIT {
     }
 };
 
+template<class T>
 struct DummySegTree {
-    vi v;
-    DummySegTree(const vi& vals) : v(vals) {}
-    void modify(lli p, lli val) {
+    vector<T> v;
+    DummySegTree(const vector<T>& vals) : v(vals) {}
+    void modify(lli p, T val) {
         v[p] = val;
     }
-    lli query(lli l, lli r) {
-        lli res = 0;
+    T query(lli l, lli r) {
+        T res;
         for(lli i = l; i < r; ++i) {
-            res += v[i];
+            res = res + v[i];
         }
         return res;
     }
@@ -99,12 +100,25 @@ void testDatastruct() {
     });
 
     rc::check("segtree: segment tree works", []() {
-        vi vals = *rc::gen::arbitrary<vi>().as("vals");
-        SegTree st = SegTree(vals);
-        DummySegTree dst = DummySegTree(vals);
+        vvi vals = *rc::gen::arbitrary<vvi>().as("vals");
+        struct Monoid {
+            vi v_;
+            Monoid() : v_(vi()) {}
+            Monoid(const vi& v) : v_(v) {}
+            Monoid operator+(const Monoid& rhs) {
+                vi res = v_;
+                for(lli i : rhs.v_) res.push_back(i);
+                return res;
+            }
+        };
+
+        vector<Monoid> mvals;
+        for(vi v : vals) mvals.pb(v);
+        SegTree<Monoid> st = SegTree<Monoid>(mvals);
+        DummySegTree<Monoid> dst = DummySegTree<Monoid>(mvals);
 
         vii lr = *rc::gen::container<vii>(rc::gen::tuple(rc::gen::inRange(0, (int)vals.size()), rc::gen::inRange(0, (int)vals.size()))).as("lr");
-        vii updates = *rc::gen::container<vii>(lr.size(), rc::gen::tuple(rc::gen::inRange(0, (int)vals.size()), rc::gen::arbitrary<lli>())).as("updates");
+        vector<tuple<lli, vi>> updates = *rc::gen::container<vector<tuple<lli, vi>>>(lr.size(), rc::gen::tuple(rc::gen::inRange(0, (int)vals.size()), rc::gen::arbitrary<vi>())).as("updates");
         for(pii& t : lr) {
             if(X(t) > Y(t)) {
                 t = mt(Y(t), X(t));
@@ -112,12 +126,13 @@ void testDatastruct() {
         }
 
         FOR(i, lr.size()) {
-            lli l, r, idx, v;
+            lli l, r, idx;
+            Monoid v;
             tie(l, r) = lr[i];
             tie(idx, v) = updates[i];
             st.modify(idx, v);
             dst.modify(idx, v);
-            RC_ASSERT(st.query(l, r) == dst.query(l, r));
+            RC_ASSERT(st.query(l, r).v_ == dst.query(l, r).v_);
         }
     });
 }
