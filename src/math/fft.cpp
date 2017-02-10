@@ -4,10 +4,10 @@ typedef complex<double> cpx;
 template<int base>
 struct FFT {
     static const lli N = 1 << base;
-    cpx rt[N];
-    cpx rtconj[N];
-    int rev[N];
-    FFT() {
+    vector<cpx> rt;
+    vector<cpx> rtconj;
+    vi rev;
+    FFT() : rt(N), rtconj(N), rev(N) {
         FOR(i, N) rev[i] = 0;
         FOR(i, N) rev[i] = (rev[i >> 1] >> 1) + ((i&1) << (base-1));
         FOR(i, N/2) rt[i+N/2] = polar(1.0, 2 * PI * i / N);
@@ -15,30 +15,31 @@ struct FFT {
         FOR(i, N) rtconj[i] = conj(rt[i]);
     }
 
-    void fft(const vector<cpx>& a, vector<cpx>& f, bool inv = false) {
-        assert(a.size() == N && f.size() == N);
-        cpx* roots = inv ? rtconj : rt;
-        FOR(i, N) f[i] = a[rev[i]];
+    void fft(vector<cpx>& a,  bool inv = false) {
+        assert(a.size() == N);
+        cpx* roots = inv ? rtconj.data() : rt.data();
+        FOR(i, N) if(i < rev[i]) swap(a[i], a[rev[i]]);
         for(lli k = 1; k < N; k <<= 1) for(lli i = 0; i < N; i += 2*k) FOR(j, k) {
-            cpx z = f[i+j+k] * roots[j+k];
-            f[i+j+k] = f[i+j] - z;
-            f[i+j]   = f[i+j] + z;
+            cpx z = a[i+j+k] * roots[j+k];
+            a[i+j+k] = a[i+j] - z;
+            a[i+j]   = a[i+j] + z;
         }
-        if(inv) FOR(i, N) f[i] /= N;
+        if(inv) FOR(i, N) a[i] /= N;
     }
 
     vi mult(const vi& a, const vi& b) {
         assert(a.size() == N && b.size() == N);
-        vector<cpx> f(N), c(N);
+        vector<cpx> c(N);
         FOR(i, N) c[i] = cpx(a[i], b[i]);
-        fft(c, f);
+        fft(c);
+        vector<cpx> f = c;
         FOR(i, N) {
             lli j = (N - i) & (N - 1);
             c[i] = (f[j] * f[j] - conj(f[i] * f[i])) * cpx(0, -0.25/N);
         }
-        fft(c, f);
+        fft(c);
         vi res(N);
-        FOR(i, N) res[i] = (lli)round(f[i].real());
+        FOR(i, N) res[i] = (lli)round(c[i].real());
         return res;
     }
 

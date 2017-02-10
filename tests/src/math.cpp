@@ -29,12 +29,11 @@ void testMath() {
         auto vigen = rc::gen::container<vector<cpx>>(cpxgen);
         vector<cpx> a = *vigen.as("a");
         while(a.size() != fft.N) a.push_back(cpx(0, 0));
-        vector<cpx> b(fft.N);
-        vector<cpx> c(fft.N);
-        fft.fft(a, b, false);
-        fft.fft(b, c, true);
+        vector<cpx> b = a;
+        fft.fft(b, false);
+        fft.fft(b, true);
         FOR(i, a.size()) {
-            RC_ASSERT(abs(a[i]-c[i]) < 1e-5);
+            RC_ASSERT(abs(a[i]-b[i]) < 1e-5);
         }
     });
 
