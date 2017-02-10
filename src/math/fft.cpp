@@ -1,40 +1,46 @@
-const double PI = 3.141592653589793238460;
-
+const double PI = acos(-1);
 typedef complex<double> cpx;
-typedef std::valarray<cpx> CArray;
 
-void fft(CArray& x, bool inv=false, bool once=true) {
-    const size_t N = x.size();
-    assert((N & (N-1)) == 0); // Is N a power of two?
-    if (N <= 1) return;
-
-    CArray even = x[std::slice(0, N/2, 2)];
-    CArray odd  = x[std::slice(1, N/2, 2)];
-
-    fft(even, inv, false);
-    fft(odd, inv, false);
-
-    int dir = inv ? 1 : -1;
-
-    for(size_t k = 0; k < N/2; ++k) {
-        cpx t = std::polar(1.0, -2 * dir * PI * k / N) * odd[k];
-        x[k]     = even[k] + t;
-        x[k+N/2] = even[k] - t;
+template<int base>
+struct FFT {
+    static const lli N = 1 << base;
+    cpx rt[N];
+    int rev[N];
+    FFT() {
+        FOR(i, N) rev[i] = 0;
+        FOR(i, N) rev[i] = (rev[i >> 1] >> 1) + ((i&1) << (base-1));
+        FOR(i, N/2) rt[i+N/2] = polar(1.0, 2 * PI * i / N);
+        FORD(i, 0, N/2) rt[i] = rt[2*i];
     }
 
-    if(once && inv) x /= N;
-}
+    void fft(const vector<cpx>& a, vector<cpx>& f) {
+        assert(a.size() == N && f.size() == N);
+        FOR(i, N) f[i] = a[rev[i]];
+        for(lli k = 1; k < N; k <<= 1) for(lli i = 0; i < N; i += 2*k) FOR(j, k) {
+            cpx z = f[i+j+k] * rt[j+k];
+            f[i+j+k] = f[i+j] - z;
+            f[i+j]   = f[i+j] + z;
+        }
+    }
 
-int ilog2(int x) { return 31 - __builtin_clz(x); }
+    vi mult(const vi& a, const vi& b) {
+        assert(a.size() == N && b.size() == N);
+        vector<cpx> f(N), c(N);
+        FOR(i, N) c[i] = cpx(a[i], b[i]);
+        fft(c, f);
+        FOR(i, N) {
+            lli j = (N - i) & (N - 1);
+            c[i] = (f[j] * f[j] - conj(f[i] * f[i])) * cpx(0, -0.25/N);
+        }
+        fft(c, f);
+        vi res(N);
+        FOR(i, N) res[i] = (lli)round(f[i].real());
+        return res;
+    }
 
-//Works well if the coefficients are <= 10^6
-vi polymult(vi a, vi b) {
-    size_t N = 1 << (ilog2(a.size() + b.size() - 1) + 1);
-    CArray a2(N), b2(N); vi c(N);
-    FOR(i, a.size()) a2[i] = a[i];
-    FOR(i, b.size()) b2[i] = b[i];
-    fft(a2); fft(b2); a2 *= b2; fft(a2, true);
-    FOR(i, N) c[i] = (lli)floor(a2[i].real()+0.5);
-    return c;
-}
+    void pad(vi& a) {
+        a.reserve(N);
+        while(a.size() < N) a.pb(0);
+    }
+};
 

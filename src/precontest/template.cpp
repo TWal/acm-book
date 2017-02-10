@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 
 #define FOR(i, n) for(lli i = 0; i < (lli)(n); ++i)
+#define FORU(i, a, b) for(lli i = (lli)(a); i < (lli)(b); ++i)
+#define FORD(i, a, b) for(lli i = (lli)(b)-1; i >= (lli)(a); --i)
 #define ALL(x) (x).begin(), (x).end()
 
 #define X(A) get<0>(A)

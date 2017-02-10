@@ -18,11 +18,14 @@ void testMath() {
 
     rc::check("fft: polynomial multiplication using fft", []() {
         const lli N = 1000*1000;
+        const int base = 10;
+        FFT<base> fft;
         auto vigen = rc::gen::container<vi>(rc::gen::inRange(-N, N));
         vi a = *vigen.as("a");
-        vi b = *vigen.as("c");
-        vi c = polymult(a, b);
-        RC_ASSERT(c.size() >= a.size() + b.size());
+        vi b = *vigen.as("b");
+        fft.pad(a);
+        fft.pad(b);
+        vi c = fft.mult(a, b);
         FOR(n, c.size()) {
             lli cur = 0;
             for(lli k = 0; k <= n; ++k) {
