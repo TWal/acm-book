@@ -1,13 +1,13 @@
 const double PI = acos(-1);
 typedef complex<double> cpx;
 
-template<int base>
 struct FFT {
-    static const lli N = 1 << base;
+    lli base;
+    lli N;
     vector<cpx> rt;
     vector<cpx> rtconj;
     vi rev;
-    FFT() : rt(N), rtconj(N), rev(N) {
+    FFT(lli _base) : base(_base), N(1<<_base), rt(N), rtconj(N), rev(N) {
         FOR(i, N) rev[i] = 0;
         FOR(i, N) rev[i] = (rev[i >> 1] >> 1) + ((i&1) << (base-1));
         FOR(i, N/2) rt[i+N/2] = polar(1.0, 2 * PI * i / N);
@@ -48,4 +48,3 @@ struct FFT {
         while(a.size() < N) a.pb(0);
     }
 };
-

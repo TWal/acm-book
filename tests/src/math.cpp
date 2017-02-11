@@ -17,8 +17,6 @@ void testMath() {
     });
 
     rc::check("fft: inverse fft", []() {
-        const int base = 10;
-        FFT<base> fft;
         auto doublegen = rc::gen::suchThat<double>([](double d) {
             return fabs(d) < 1e6;
         });
@@ -28,6 +26,7 @@ void testMath() {
         });
         auto vigen = rc::gen::container<vector<cpx>>(cpxgen);
         vector<cpx> a = *vigen.as("a");
+        FFT fft(8*sizeof(size_t) - __builtin_clzll(a.size()));
         while(a.size() != fft.N) a.push_back(cpx(0, 0));
         vector<cpx> b = a;
         fft.fft(b, false);
@@ -39,11 +38,10 @@ void testMath() {
 
     rc::check("fft: polynomial multiplication using fft", []() {
         const lli N = 1000*1000;
-        const int base = 10;
-        FFT<base> fft;
         auto vigen = rc::gen::container<vi>(rc::gen::inRange(-N, N));
         vi a = *vigen.as("a");
         vi b = *vigen.as("b");
+        FFT fft(8*sizeof(size_t) - __builtin_clzll(a.size() + b.size() + 1));
 
         //multiplication using fft method
         fft.pad(a);
