@@ -72,8 +72,11 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \subsubsection{Extended GCD - $O(\log(\min(a, b)))$}
 \lstinputlisting{src/math/egcd.cpp}
 
-\subsubsection{FFT / Polynomial multiplication - $O(n \log n)$}
+\subsubsection{FFT / NTT / Polynomial multiplication - $O(n \log n)$}
 \lstinputlisting{src/math/fft.cpp}
+
+\subsubsection{Utility to find NTT parameters}
+\lstinputlisting[language=python]{src/math/findNTTParams.py}
 
 
 
