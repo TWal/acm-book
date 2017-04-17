@@ -8,3 +8,5 @@ string/ahocorasick: original paper (http://cr.yp.to/bib/1975/aho.pdf)
 datastruct/unionfind.cpp: wikipedia, complexity from http://stackoverflow.com/a/2326676
 datastruct/fenwick.cpp: wikipedia
 datastruct/segmenttree.cpp: http://codeforces.com/blog/entry/18051
+flow/dinic.cpp: old notebook
+flow/cap_scaling.cpp: old notebook

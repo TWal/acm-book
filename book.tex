@@ -44,7 +44,8 @@
 Pre-contest: page \pageref{precontest} \\
 Math: page \pageref{math} \\
 String processing: page \pageref{string} \\
-Data structures: page \pageref{datastruct}
+Data structures: page \pageref{datastruct} \\
+Flows: page \pageref{flows}
 
 \noindent
 Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
@@ -104,5 +105,17 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 
 \subsubsection{Segment tree - $O(\log(n))$ modify / query}
 \lstinputlisting{src/datastruct/segtree.cpp}
+
+\subsection*{Flows}
+\label{flows}
+
+\subsubsection{Common graph structure}
+\lstinputlisting{src/flow/graph.cpp}
+
+\subsubsection{Dinic - $O(V^2 E)$}
+\lstinputlisting{src/flow/dinic.cpp}
+
+\subsubsection{Capacity Scaling - $O(E^2 \log(C))$ ($C$ = capacité max)}
+\lstinputlisting{src/flow/cap_scaling.cpp}
 
 \end{document}
