@@ -1,11 +1,18 @@
 from math import sqrt
-def isPrime(n):
-    if n <= 1 or pow(2, n, n) != 2:
-        return False
-    for i in range(2, int(sqrt(n))):
-        if n%i == 0:
+def checkMillerRabin(n, a):
+    r = n-1
+    while True:
+        x = pow(a, r, n)
+        if x == n-1:
+            return True
+        if x != 1:
             return False
-    return True
+        if r%2 != 0:
+            return True
+        r = r//2
+
+def isPrime(n):
+    return all(checkMillerRabin(n, a) for a in [2,3,5,7,11,13,17,19,23,29,31])
 
 def finda(base, a):
     while True:
@@ -13,24 +20,30 @@ def finda(base, a):
             return a
         a += 1
 
-def checkUnityRoot(w, p):
-    x = w
-    for i in range(p-2):
-        if x == 1:
-            return False
-        x = (x*w)%p
-    return True
+def factorize(n):
+    res = []
+    x = 2
+    while n != 1:
+        if n%x == 0:
+            res.append(x)
+            while n%x == 0:
+                n //= x
+        x += 1
+    return res
 
 def findUnityRoot(p):
-    for i in range(1, p):
-        if checkUnityRoot(i, p):
-            return i
+    fact = factorize(p-1)
+    for w in range(1, p):
+        if all(pow(w, (p-1)//f, p) != 1 for f in fact):
+            return w
 
 base = int(input())
 a = 1
 while True:
     a = finda(base, a)
     p = a * (2**base) + 1
+    if p > 2**64:
+        break
     r = findUnityRoot(p)
     print("a =", a, ", root =", pow(r, a, p))
     a += 1
