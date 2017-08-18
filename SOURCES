@@ -10,3 +10,5 @@ datastruct/fenwick.cpp: wikipedia
 datastruct/segmenttree.cpp: http://codeforces.com/blog/entry/18051
 flow/dinic.cpp: old notebook
 flow/cap_scaling.cpp: old notebook
+graph/scc_tarjan.cpp: wikipedia
+graph/scc_kosaraju.cpp: wikipedia

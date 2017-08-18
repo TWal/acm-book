@@ -11,6 +11,7 @@ set(${PROJECT_NAME}_SOURCES
     src/string.cpp
     src/datastruct.cpp
     src/flow.cpp
+    src/graph.cpp
 )
 add_subdirectory("rapidcheck")
 
