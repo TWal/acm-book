@@ -1,9 +1,9 @@
 struct Edge {
-  Edge(lli to_, lli c_, lli cost_) : to(to_), c(c_), f(0), cost(cost_) {}
-  lli to;
-  lli c; //capacity
-  lli f; //flow
-  lli cost;
+    Edge(lli to_, lli c_, lli cost_) : to(to_), c(c_), f(0), cost(cost_) {}
+    lli to;
+    lli c; //capacity
+    lli f; //flow
+    lli cost;
 };
 
 struct Graph {

@@ -8,18 +8,14 @@ template<typename T>
 static rc::Gen<T> getGraph() {
     return rc::gen::withSize([](int n) {
         n += 2;
-        return rc::gen::map(rc::gen::container<vector<int>>(n*(n-1), rc::gen::inRange(-10000, 10000)), [=](const vector<int>& v) {
+        return rc::gen::map(rc::gen::container<vector<int>>(n*(n-1), rc::gen::inRange(0, 10000)), [=](const vector<int>& v) {
             T graph(n, 0, n-1);
             lli k = 0;
             FOR(i, n) {
                 FOR(j, n) {
                     if(i == j) continue;
                     lli c = v[k++];
-                    if(c > 0) {
-                        graph.addEdge(i, j, c);
-                    } else if(c < 0) {
-                        graph.addEdge(j, i, -c);
-                    }
+                    graph.addEdge(i, j, c);
                 }
             }
             return graph;
@@ -27,7 +23,7 @@ static rc::Gen<T> getGraph() {
     });
 }
 
-#define CHECK(g) \
+#define CHECKFLOW(g) \
     lli f = g.flow();                  \
     lli N = g.adj.size();              \
     vi flows(N, 0);                    \
@@ -52,10 +48,10 @@ static rc::Gen<T> getGraph() {
 void testFlow() {
     rc::check("dinic: flow is valid", []() {
         Dinic g = *getGraph<Dinic>();
-        CHECK(g);
+        CHECKFLOW(g);
     });
 
-    rc::check("graph: check minCut", []() {
+    rc::check("flowgraph: check minCut == maxFlow", []() {
         Dinic g = *getGraph<Dinic>();
         lli flow = g.flow();
         vb minCut = g.minCut();
@@ -78,7 +74,7 @@ void testFlow() {
 
     rc::check("cap_scaling: flow is valid", []() {
         CapScaling g = *getGraph<CapScaling>();
-        CHECK(g);
+        CHECKFLOW(g);
     });
 
     rc::check("dinic & cap_scaling: same flow", []() {
