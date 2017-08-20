@@ -13,3 +13,4 @@ flow/cap_scaling.cpp: old notebook
 graph/scc_tarjan.cpp: wikipedia
 graph/scc_kosaraju.cpp: wikipedia
 graph/articulation.cpp: wikipedia, replacing depth with ind
+graph/bridges.cpp: adapted from articulation.cpp

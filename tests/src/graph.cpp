@@ -3,6 +3,7 @@
 #include <graph/scc_tarjan.cpp>
 #include <graph/scc_kosaraju.cpp>
 #include <graph/articulation.cpp>
+#include <graph/bridges.cpp>
 #include <rapidcheck.h>
 
 static rc::Gen<vvi> getGraph() {
@@ -74,11 +75,11 @@ struct DummySCC {
     }
 };
 
-struct CompConn {
+struct CompConnVert {
     vvi adj;
     lli N, ncc;
     vb seen;
-    CompConn(const vvi& _adj, lli removedVert) : adj(_adj), N(adj.size()), ncc(0), seen(N, false) {
+    CompConnVert(const vvi& _adj, lli removedVert) : adj(_adj), N(adj.size()), ncc(0), seen(N, false) {
         if(removedVert >= 0) seen[removedVert] = true;
         FOR(i, N) if(!seen[i]) {
             dfs(i);
@@ -92,6 +93,28 @@ struct CompConn {
         }
     }
 };
+
+struct CompConnEdge {
+    vvi adj;
+    lli N, ncc, e1, e2;
+    vb seen;
+    CompConnEdge(const vvi& _adj, lli _e1, lli _e2) : adj(_adj), N(adj.size()), ncc(0), e1(_e1), e2(_e2), seen(N, false) {
+        FOR(i, N) if(!seen[i]) {
+            dfs(i);
+            ncc += 1;
+        }
+    }
+    bool ok(lli _e1, lli _e2) {
+        return !((e1 == _e1 && e2 == _e2) || (e1 == _e2 && e2 == _e1));
+    }
+    void dfs(lli v) {
+        seen[v] = true;
+        for(lli n : adj[v]) if(!seen[n] && ok(v, n)) {
+            dfs(n);
+        }
+    }
+};
+
 
 void testGraph() {
     rc::check("scc_tarjan", []() {
@@ -120,13 +143,35 @@ void testGraph() {
 
     rc::check("articulation", []() {
         vvi g = *getUndirectedGraph();
-        CompConn nbcc(g, -1);
+        CompConnVert nbcc(g, -1);
         Articulation art(g);
         lli N = g.size();
-        vb ap(N, false);
         FOR(i, N) {
-            CompConn newNbcc(g, i);
+            CompConnVert newNbcc(g, i);
             RC_ASSERT((nbcc.ncc < newNbcc.ncc) == art.ap[i]);
+        }
+    });
+
+    rc::check("bridge", []() {
+        auto edgeEqual = [](pii e1, pii e2) -> bool {
+            return (X(e1) == X(e2) && Y(e1) == Y(e2)) || (X(e1) == Y(e2) && Y(e1) == X(e2));
+        };
+        vvi g = *getUndirectedGraph();
+        CompConnEdge nbcc(g, -1, -1);
+        Bridges bridges(g);
+        lli N = g.size();
+        FOR(i, N) {
+            for(lli j : g[i]) {
+                bool isBridge = false;
+                for(pii e : bridges.bridges) {
+                    if(edgeEqual(e, mt(i, j))) {
+                        isBridge = true;
+                        break;
+                    }
+                }
+                CompConnEdge newNbcc(g, i, j);
+                RC_ASSERT((nbcc.ncc < newNbcc.ncc) == isBridge);
+            }
         }
     });
 }
