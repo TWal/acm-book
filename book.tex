@@ -9,16 +9,13 @@
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \lstset{
-  language=C++,
-  morekeywords=
-  { lli, llu, pii, piii, vi, vii, viii, vvi, vvii, vviii,
-    pt, FOR, FORU, FORD
-  },
-  basicstyle=\ttfamily,
-  keywordstyle=\color{blue}\ttfamily,
-  stringstyle=\color{red}\ttfamily,
-  commentstyle=\color{dkgreen}\ttfamily,
-  morecomment=[l][\color{magenta}]{\#}
+    language=C++,
+    morekeywords={lli, llu, pii, piii, vi, vii, viii, vvi, vvii, vviii, pt, FOR, FORU, FORD},
+    basicstyle=\ttfamily,
+    keywordstyle=\color{blue}\ttfamily,
+    stringstyle=\color{red}\ttfamily,
+    commentstyle=\color{dkgreen}\ttfamily,
+    morecomment=[l][\color{magenta}]{\#}
 }
 
 \setlength{\columnsep}{15pt}
@@ -122,7 +119,13 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \subsection*{Graphs}
 \label{graphs}
 
-\subsubsection{Strongly Connected Component Tarjan - $O(V + E)$}
+\subsubsection{Strongly connected component Tarjan - $O(V + E)$}
 \lstinputlisting{src/graph/scc_tarjan.cpp}
+
+%\subsubsection{Strongly connected component Kosaraju - $O(V + E)$}
+%\lstinputlisting{src/graph/scc_kosaraju.cpp}
+
+\subsubsection{Articulation points - $O(V + E)$}
+\lstinputlisting{src/graph/articulation.cpp}
 
 \end{document}
