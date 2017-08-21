@@ -7,6 +7,7 @@ string/zfunc.cpp: https://github.com/stjepang/snippets/blob/master/z_algorithm.c
 string/ahocorasick: original paper (http://cr.yp.to/bib/1975/aho.pdf)
 datastruct/unionfind.cpp: wikipedia, complexity from http://stackoverflow.com/a/2326676
 datastruct/fenwick.cpp: wikipedia
+datastruct/fenwick_range.cpp: http://petr-mitrichev.blogspot.com/2013/05/fenwick-tree-range-updates.html
 datastruct/segmenttree.cpp: http://codeforces.com/blog/entry/18051
 flow/dinic.cpp: old notebook
 flow/cap_scaling.cpp: old notebook

@@ -13,6 +13,11 @@ struct SegTree {
     void modify(lli p, T value) {
         for(t[p += n] = value; p /= 2;) t[p] = t[2*p] + t[2*p+1];
     }
+    // v[p] = v[p] + value (copy-paste modify)
+    void inc(lli p, T value) {
+        p += n;
+        for(t[p] = t[p] + value; p /= 2;) t[p] = t[2*p] + t[2*p+1];
+    }
     // returns sum(v[l:r])
     T query(lli l, lli r) {
         T resl = T(), resr = T();
