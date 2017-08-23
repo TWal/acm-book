@@ -192,6 +192,50 @@ ostream& operator<<(ostream& os, const NonCommMonoid& a) {
     return os;
 }
 
+struct CommMonoid {
+    vi v_;
+    CommMonoid() : v_() {}
+    CommMonoid(const vi& v) : v_(v) {
+        sort(v_.begin(), v_.end());
+    }
+    CommMonoid operator+(const CommMonoid& rhs) const {
+        vi res;
+        lli i = 0, j = 0;
+        while(i < v_.size() && j < rhs.v_.size()) {
+            if(v_[i] < rhs.v_[j]) res.pb(v_[i++]);
+            else res.pb(rhs.v_[j++]);
+        }
+        while(i < v_.size()) res.pb(v_[i++]);
+        while(j < rhs.v_.size()) res.pb(rhs.v_[j++]);
+        return res;
+    }
+    CommMonoid operator*(lli m) const {
+        vi res;
+        for(lli i : v_) {
+            FOR(_, m) {
+                res.pb(i);
+            }
+        }
+        return res;
+    };
+    bool operator==(const CommMonoid& rhs) const {
+        return v_ == rhs.v_;
+    }
+};
+
+ostream& operator<<(ostream& os, const CommMonoid& a) {
+    os << "[";
+    FOR(i, a.v_.size()) {
+        os << a.v_[i];
+        if(i+1 != (lli)a.v_.size()) {
+            os << ", ";
+        }
+    }
+    os << "]";
+    return os;
+}
+
+
 namespace rc {
 
 template<>
@@ -199,6 +243,15 @@ struct Arbitrary<NonCommMonoid> {
     static Gen<NonCommMonoid> arbitrary() {
         return gen::build<NonCommMonoid>(
             gen::set(&NonCommMonoid::v_, rc::gen::arbitrary<vi>())
+        );
+    }
+};
+
+template<>
+struct Arbitrary<CommMonoid> {
+    static Gen<CommMonoid> arbitrary() {
+        return gen::build<CommMonoid>(
+            gen::set(&CommMonoid::v_, rc::gen::arbitrary<vi>())
         );
     }
 };
@@ -275,19 +328,48 @@ struct SegTreeQuery: rc::state::Command<DummySegTree<T>, SUT> {
     }
 };
 
+
+template<class T, class SUT>
+struct SegTreeAddRange: rc::state::Command<DummySegTree<T>, SUT> {
+    lli l, r;
+    T val;
+    SegTreeAddRange(const DummySegTree<T>& dseg) :
+        l(*rc::gen::inRange((lli)0, (lli)dseg.v.size())), r(*rc::gen::inRange((lli)l, (lli)dseg.v.size())), val(*rc::gen::arbitrary<T>()) {}
+
+    void apply(DummySegTree<T>& dseg) const override {
+        dseg.incRange(l, r, val);
+    }
+    void run(const DummySegTree<T>& dseg, SUT& seg) const override {
+        seg.add(l, r, val);
+    }
+    void show(std::ostream& os) const override {
+        os << "AddRange(" << l << ", " << r << ", " << val << ")";
+    }
+};
+
 static void testSegTree() {
     rc::check("segtree", []() {
-        vvi vals = *rc::gen::arbitrary<vvi>().as("vals");
+        vector<NonCommMonoid> vals = *rc::gen::arbitrary<vector<NonCommMonoid>>().as("vals");
 
-        vector<NonCommMonoid> mvals;
-        for(vi v : vals) mvals.pb(v);
-        SegTree<NonCommMonoid> st = SegTree<NonCommMonoid>(mvals);
-        DummySegTree<NonCommMonoid> dst = DummySegTree<NonCommMonoid>(mvals);
+        SegTree<NonCommMonoid> st = SegTree<NonCommMonoid>(vals);
+        DummySegTree<NonCommMonoid> dst = DummySegTree<NonCommMonoid>(vals);
 
         rc::state::check(dst, st, rc::state::gen::execOneOfWithArgs<
                 SegTreeModify<NonCommMonoid, SegTree<NonCommMonoid>>,
                 SegTreeInc<NonCommMonoid, SegTree<NonCommMonoid>>,
                 SegTreeQuery<NonCommMonoid, SegTree<NonCommMonoid>>
+        >());
+    });
+
+    rc::check("lazysegtree", []() {
+        vector<CommMonoid> vals = *rc::gen::arbitrary<vector<CommMonoid>>().as("vals");
+
+        LazySegTree<CommMonoid> st = LazySegTree<CommMonoid>(vals);
+        DummySegTree<CommMonoid> dst = DummySegTree<CommMonoid>(vals);
+
+        rc::state::check(dst, st, rc::state::gen::execOneOfWithArgs<
+                SegTreeQuery<CommMonoid, LazySegTree<CommMonoid>>,
+                SegTreeAddRange<CommMonoid, LazySegTree<CommMonoid>>
         >());
     });
 }

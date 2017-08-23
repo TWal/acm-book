@@ -1,5 +1,5 @@
 //Works with any monoid (even non-commutative ones)
-//Must implement: T() -> zero; T(const T&) -> copy; T operator+(const T&)
+//Must implement: T() -> zero; T operator+(const T&)
 template<class T>
 struct SegTree {
     lli n;

@@ -92,6 +92,7 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \lstinputlisting{src/string/ahocorasick.cpp}
 
 
+
 \subsection*{Data structures}
 \label{datastruct}
 
@@ -107,6 +108,11 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \subsubsection{Segment tree - $O(\log(n))$ modify / inc / query}
 \lstinputlisting{src/datastruct/segtree.cpp}
 
+\subsubsection{Lazy Segment tree - $O(\log(n))$ range add / query}
+\lstinputlisting{src/datastruct/lazysegtree.cpp}
+
+
+
 \subsection*{Flows}
 \label{flows}
 
@@ -118,6 +124,8 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 
 \subsubsection{Capacity Scaling - $O(E^2 \log(C))$ ($C$ = capacité max)}
 \lstinputlisting{src/flow/cap_scaling.cpp}
+
+
 
 \subsection*{Graphs}
 \label{graphs}
