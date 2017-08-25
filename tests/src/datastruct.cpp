@@ -4,6 +4,8 @@
 #include <datastruct/fenwick_range.cpp>
 #include <datastruct/segtree.cpp>
 #include <datastruct/lazysegtree.cpp>
+#include <datastruct/treap.cpp>
+#include <datastruct/treap_gensegtree.cpp>
 #include <rapidcheck.h>
 #include <rapidcheck/state.h>
 
@@ -374,9 +376,203 @@ static void testSegTree() {
     });
 }
 
+
+
+/*   _____
+    |_   _| __ ___  __ _ _ __
+      | || '__/ _ \/ _` | '_ \
+      | || | |  __/ (_| | |_) |
+      |_||_|  \___|\__,_| .__/
+                        |_|
+*/
+
+struct MyTreap : public Treap<lli, MyTreap> {
+    MyTreap(lli s_) : Treap<lli, MyTreap>(s_) {}
+};
+
+struct TreapInsert : rc::state::Command<lli, MyTreap*> {
+    lli x;
+    TreapInsert(const lli&) : x(*rc::gen::arbitrary<lli>()) {}
+    void run(const lli&, MyTreap*& treap) const override {
+        treap = treap->insert(x);
+    }
+    void show(std::ostream& os) const override {
+        os << "Insert(" << x << ")";
+    }
+};
+
+struct TreapCheckHeap : rc::state::Command<lli, MyTreap*> {
+    TreapCheckHeap(const lli&) {}
+    bool checkHeap(MyTreap* tr, lli mini) const {
+        if(tr->h < mini) return false;
+        bool res = true;
+        if(tr->l) res = res && checkHeap(tr->l, tr->h);
+        if(tr->r) res = res && checkHeap(tr->r, tr->h);
+        return res;
+    }
+    void run(const lli&, MyTreap*& treap) const override {
+        RC_ASSERT(checkHeap(treap, numeric_limits<lli>::min()));
+    }
+    void show(std::ostream& os) const override {
+        os << "CheckHeap()";
+    }
+};
+
+struct TreapCheckBst : rc::state::Command<lli, MyTreap*> {
+    TreapCheckBst(const lli&) {}
+    bool checkBst(MyTreap* tr, lli mini, lli maxi) const {
+        if(tr->s < mini || tr->s > maxi) return false;
+        bool res = true;
+        if(tr->l) res = res && checkBst(tr->l, mini, tr->s);
+        if(tr->r) res = res && checkBst(tr->r, tr->s, maxi);
+        return res;
+    }
+    void run(const lli&, MyTreap*& treap) const override {
+        RC_ASSERT(checkBst(treap, numeric_limits<lli>::min(), numeric_limits<lli>::max()));
+    }
+    void show(std::ostream& os) const override {
+        os << "CheckBst()";
+    }
+};
+
+struct TreapCheckSize : rc::state::Command<lli, MyTreap*> {
+    TreapCheckSize(const lli&) {}
+    lli checkSize(MyTreap* tr) const {
+        lli size = 1;
+        if(tr->l) size += checkSize(tr->l);
+        if(tr->r) size += checkSize(tr->r);
+        RC_ASSERT(size == tr->size);
+        return size;
+    }
+    void run(const lli&, MyTreap*& treap) const override {
+        RC_ASSERT(checkSize(treap));
+    }
+    void show(std::ostream& os) const override {
+        os << "CheckSize()";
+    }
+};
+
+template<class Ord, class T>
+struct DummyGenSegTree {
+    vector<tuple<Ord, T>> v;
+    DummyGenSegTree(Ord s) : v(1, mt(s, T())) {}
+
+    void insert(Ord s, T val) {
+        v.pb(mt(s, val));
+        sort(v.begin(), v.end());
+    }
+    void add(Ord left, Ord right, T val) {
+        FOR(i, v.size()) {
+            if(X(v[i]) >= left && X(v[i]) <= right) {
+                Y(v[i]) = Y(v[i]) + val;
+            }
+        }
+    }
+    T query(Ord left, Ord right) const {
+        T res = T();
+        FOR(i, v.size()) {
+            if(X(v[i]) >= left && X(v[i]) <= right) {
+                res = res + Y(v[i]);
+            }
+        }
+        return res;
+    }
+};
+
+struct IntMonoid {
+    lli v;
+    IntMonoid() : v(0) {}
+    IntMonoid(lli v_) : v(v_) {}
+    IntMonoid operator+(IntMonoid rhs) const {
+        return v + rhs.v;
+    }
+    bool operator==(IntMonoid rhs) const {
+        return v == rhs.v;
+    }
+    IntMonoid operator*(lli rhs) const {
+        return v*rhs;
+    }
+    bool operator<(IntMonoid rhs) const {
+        return v < rhs.v;
+    }
+};
+
+ostream& operator<<(ostream& os, const IntMonoid& a) {
+    os << a.v;
+    return os;
+}
+
+
+using GST = GenSegTree<double, IntMonoid>;
+using DGST = DummyGenSegTree<double, IntMonoid>;
+
+struct GenSegTreeInsert : rc::state::Command<DGST, GST*> {
+    double s;
+    IntMonoid val;
+    GenSegTreeInsert(const DGST&) : s(*rc::gen::arbitrary<double>()), val(*rc::gen::arbitrary<lli>()) {}
+    void apply(DGST& dseg) const override {
+        dseg.insert(s, val);
+    }
+    void run(const DGST&, GST*& seg) const override {
+        seg = seg->insert(s, val);
+    }
+    void show(std::ostream& os) const override {
+        os << "Insert(" << s << ", " << val << ")";
+    }
+};
+
+struct GenSegTreeAdd : rc::state::Command<DGST, GST*> {
+    double left;
+    double right;
+    IntMonoid val;
+    GenSegTreeAdd(const DGST&) : left(*rc::gen::arbitrary<double>()), right(*rc::gen::arbitrary<double>()), val(*rc::gen::arbitrary<lli>()) {
+        if(left > right) swap(left, right);
+    }
+    void apply(DGST& dseg) const override {
+        dseg.add(left, right, val);
+    }
+    void run(const DGST&, GST*& seg) const override {
+        seg->add(left, right, val);
+    }
+    void show(std::ostream& os) const override {
+        os << "Add(" << left << ", " << right << ", " << val << ")";
+    }
+};
+
+struct GenSegTreeQuery : rc::state::Command<DGST, GST*> {
+    double left;
+    double right;
+    GenSegTreeQuery(const DGST&) : left(*rc::gen::arbitrary<double>()), right(*rc::gen::arbitrary<double>()) {
+        if(left > right) swap(left, right);
+    }
+    void run(const DGST& dseg, GST*& seg) const override {
+        RC_ASSERT(dseg.query(left, right) == seg->query(left, right));
+    }
+    void show(std::ostream& os) const override {
+        os << "Query(" << left << ", " << right << ")";
+    }
+};
+
+void testTreap() {
+    rc::check("treap", []() {
+        lli meh = 0;
+        MyTreap* treap = new MyTreap(0);
+
+        rc::state::check(meh, treap, rc::state::gen::execOneOfWithArgs<TreapInsert, TreapCheckHeap, TreapCheckBst, TreapCheckSize>());
+    });
+
+    rc::check("gensegtree", []() {
+        GST* gst = new GST(0);
+        DGST dgst(0);
+
+        rc::state::check(dgst, gst, rc::state::gen::execOneOfWithArgs<GenSegTreeInsert, GenSegTreeAdd, GenSegTreeQuery>());
+    });
+}
+
 void testDatastruct() {
     testUF();
     testFenwick();
     testSegTree();
+    testTreap();
 }
 
