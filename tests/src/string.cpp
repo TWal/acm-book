@@ -3,14 +3,14 @@
 #include <string/zfunc.cpp>
 #include <string/ahocorasick.cpp>
 
-#include <datastruct/unionfind.cpp>
-
 const int MAX_TRA = 26;
 char normalize(char c) { //normalize `c` in [0, ..., MAX_TRA-1]
     return c - 'a';
 }
 #include <string/suffixautomaton.cpp>
+#include <string/suffixarray.cpp>
 
+#include <datastruct/unionfind.cpp>
 #include <rapidcheck.h>
 
 //Generates a "binary" string because it is more interesting to test
@@ -205,13 +205,13 @@ void testString() {
 
     rc::check("suffixautomaton: is connected and acyclic", []() {
         string s = *getString().as("str");
-        SA sa;
+        SuffixAutomaton sa;
         sa.reserve(s.size());
         for(char c : s) sa.add(c);
         struct Dfs {
-            SA& sa;
+            SuffixAutomaton& sa;
             vi state;
-            Dfs(SA& sa_) : sa(sa_), state(sa.aut.size(), 0) {}
+            Dfs(SuffixAutomaton& sa_) : sa(sa_), state(sa.aut.size(), 0) {}
             void dfs(lli node) {
                 RC_ASSERT(state[node] != 1);
                 if(state[node] == 2) return;
@@ -233,14 +233,14 @@ void testString() {
 
     rc::check("suffixautomaton: match suffixes and only them", []() {
         string s = *getString().as("str");
-        SA sa;
+        SuffixAutomaton sa;
         sa.reserve(s.size());
         for(char c : s) sa.add(c);
         sa.computeFinals();
         struct Dfs {
-            SA& sa;
+            SuffixAutomaton& sa;
             vector<vector<string>> match;
-            Dfs(SA& sa_) : sa(sa_), match(sa.aut.size()) {}
+            Dfs(SuffixAutomaton& sa_) : sa(sa_), match(sa.aut.size()) {}
             void dfs(lli node, const string& s) {
                 match[node].pb(s);
                 FOR(i, MAX_TRA) {
@@ -271,7 +271,7 @@ void testString() {
     rc::check("suffixautomaton: size is linear", []() {
         string s = *getString().as("str");
         RC_PRE(s.size() >= 3);
-        SA sa;
+        SuffixAutomaton sa;
         sa.reserve(s.size());
         for(char c : s) sa.add(c);
         size_t N = s.size();
@@ -283,7 +283,7 @@ void testString() {
 
     rc::check("suffixautomaton: automaton is minimal", []() {
         string s = *getString().as("str");
-        SA sa;
+        SuffixAutomaton sa;
         sa.reserve(s.size());
         for(char c : s) sa.add(c);
         sa.computeFinals();
@@ -344,6 +344,40 @@ void testString() {
         }
         FOR(i, N) {
             RC_ASSERT(uf.find(i) == i);
+        }
+    });
+
+    rc::check("suffixarray: sa is the suffix array", []() {
+        string s = *getString().as("str");
+        RC_PRE(s.size() >= 1);
+        vector<string> suf;
+        FOR(i, s.size()) {
+            suf.pb(s.substr(s.size()-i-1, i+1));
+        }
+        sort(suf.begin(), suf.end());
+        SuffixArray sa(s);
+        FOR(i, s.size()) {
+            RC_ASSERT(sa.sa[i] == s.size()-suf[i].size());
+        }
+    });
+
+    rc::check("suffixarray: pos is inverse of sa", []() {
+        string s = *getString().as("str");
+        RC_PRE(s.size() >= 1);
+        SuffixArray sa(s);
+        FOR(i, s.size()) {
+            RC_ASSERT(sa.pos[sa.sa[i]] == i);
+        }
+    });
+
+    rc::check("suffixarray: lcp is the longest common prefix", []() {
+        string s = *getString().as("str");
+        RC_PRE(s.size() >= 1);
+        SuffixArray sa(s);
+        FOR(i, s.size()-1) {
+            lli lcp = 0;
+            while(s[sa.sa[i]+lcp] == s[sa.sa[i+1]+lcp]) lcp += 1;
+            RC_ASSERT(lcp == sa.lcp[i]);
         }
     });
 

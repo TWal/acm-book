@@ -94,6 +94,8 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \subsubsection{Suffix automaton - $O(n)$}
 \lstinputlisting{src/string/suffixautomaton.cpp}
 
+\subsubsection{Suffix array \& LCP - $O(n \log(n)^2)$}
+\lstinputlisting{src/string/suffixarray.cpp}
 
 \subsection*{Data structures}
 \label{datastruct}
@@ -113,7 +115,7 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \subsubsection{Lazy Segment tree - $O(\log(n))$ range add / query}
 \lstinputlisting{src/datastruct/lazysegtree.cpp}
 
-\subsubsection{Treap - Augmentable binary tree - $O(\log(n))$ insert / split / merge}
+\subsubsection{Treap - Augmentable binary search tree - $O(\log(n))$ insert / split / merge}
 \lstinputlisting{src/datastruct/treap.cpp}
 
 \subsubsection{Generic segment tree - Example of treap augmentation - $O(\log(n))$ insert / query / add}

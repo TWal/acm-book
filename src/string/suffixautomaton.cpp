@@ -3,7 +3,7 @@
 //     return c - 'a';
 // }
 
-struct SA {
+struct SuffixAutomaton {
     vector<array<lli, MAX_TRA>> aut;
     vi len, link;
     vb isFinal;
@@ -17,7 +17,7 @@ struct SA {
         return aut.size()-1;
     }
 
-    SA() {
+    SuffixAutomaton() {
         last = insert(0, -1);
     }
 
