@@ -1,4 +1,3 @@
-from math import sqrt
 def checkMillerRabin(n, a):
     r = n-1
     while True:
@@ -11,8 +10,8 @@ def checkMillerRabin(n, a):
             return True
         r = r//2
 
-def isPrime(n):
-    return all(checkMillerRabin(n, a) for a in [2,3,5,7,11,13,17,19,23,29,31])
+def isPrime(n, l = [2,3,5,7,11,13,17,19,23,29,31]):
+    return n >= 2 and (n in l or all(checkMillerRabin(n, a) for a in l))
 
 def finda(base, a):
     while True:
