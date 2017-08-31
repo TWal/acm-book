@@ -2,6 +2,15 @@
 #include <string/kmp.cpp>
 #include <string/zfunc.cpp>
 #include <string/ahocorasick.cpp>
+
+#include <datastruct/unionfind.cpp>
+
+const int MAX_TRA = 26;
+char normalize(char c) { //normalize `c` in [0, ..., MAX_TRA-1]
+    return c - 'a';
+}
+#include <string/suffixautomaton.cpp>
+
 #include <rapidcheck.h>
 
 //Generates a "binary" string because it is more interesting to test
@@ -193,5 +202,150 @@ void testString() {
             RC_ASSERT(curRes == result[i]);
         }
     });
+
+    rc::check("suffixautomaton: is connected and acyclic", []() {
+        string s = *getString().as("str");
+        SA sa;
+        sa.reserve(s.size());
+        for(char c : s) sa.add(c);
+        struct Dfs {
+            SA& sa;
+            vi state;
+            Dfs(SA& sa_) : sa(sa_), state(sa.aut.size(), 0) {}
+            void dfs(lli node) {
+                RC_ASSERT(state[node] != 1);
+                if(state[node] == 2) return;
+                state[node] = 1;
+                FOR(i, MAX_TRA) {
+                    if(sa.aut[node][i] >= 0) {
+                        dfs(sa.aut[node][i]);
+                    }
+                }
+                state[node] = 2;
+            }
+        };
+        Dfs dfs(sa);
+        dfs.dfs(0);
+        FOR(i, dfs.state.size()) {
+            RC_ASSERT(dfs.state[i] == 2);
+        }
+    });
+
+    rc::check("suffixautomaton: match suffixes and only them", []() {
+        string s = *getString().as("str");
+        SA sa;
+        sa.reserve(s.size());
+        for(char c : s) sa.add(c);
+        sa.computeFinals();
+        struct Dfs {
+            SA& sa;
+            vector<vector<string>> match;
+            Dfs(SA& sa_) : sa(sa_), match(sa.aut.size()) {}
+            void dfs(lli node, const string& s) {
+                match[node].pb(s);
+                FOR(i, MAX_TRA) {
+                    if(sa.aut[node][i] >= 0) {
+                        dfs(sa.aut[node][i], s + (char)('a' + i));
+                    }
+                }
+            }
+        };
+        Dfs dfs(sa);
+        dfs.dfs(0, "");
+
+        vector<string> suffaut;
+        FOR(i, sa.aut.size()) {
+            if(sa.isFinal[i]) {
+                suffaut.insert(suffaut.end(), dfs.match[i].begin(), dfs.match[i].end());
+            }
+        }
+        vector<string> suff;
+        FOR(i, s.size()+1) {
+            suff.pb(s.substr(s.size()-i, i));
+        }
+        sort(suffaut.begin(), suffaut.end());
+        sort(suff.begin(), suff.end());
+        RC_ASSERT(suffaut == suff);
+    });
+
+    rc::check("suffixautomaton: size is linear", []() {
+        string s = *getString().as("str");
+        RC_PRE(s.size() >= 3);
+        SA sa;
+        sa.reserve(s.size());
+        for(char c : s) sa.add(c);
+        size_t N = s.size();
+        RC_ASSERT(sa.aut.size() <= 2*N);
+        RC_ASSERT(sa.link.size() <= 2*N);
+        RC_ASSERT(sa.len.size() <= 2*N);
+    });
+
+
+    rc::check("suffixautomaton: automaton is minimal", []() {
+        string s = *getString().as("str");
+        SA sa;
+        sa.reserve(s.size());
+        for(char c : s) sa.add(c);
+        sa.computeFinals();
+        size_t N = sa.aut.size();
+        //complete the automaton with a "dead-end" state
+        FOR(i, sa.aut.size()) {
+            FOR(j, MAX_TRA) {
+                if(sa.aut[i][j] == -1) {
+                    sa.aut[i][j] = N;
+                }
+            }
+        }
+        sa.aut.pb(array<lli, MAX_TRA>());
+        FOR(j, MAX_TRA) {
+            sa.aut[N][j] = N;
+        }
+        sa.isFinal.pb(false);
+        N += 1;
+        //use Moore's algorithm
+        UF uf(N);
+        lli fstate = -1, nfstate = -1;
+        FOR(i, N) {
+            if(sa.isFinal[i]) {
+                if(fstate >= 0) uf.unite(fstate, i);
+                else fstate = i;
+            } else {
+                if(nfstate >= 0) uf.unite(nfstate, i);
+                else nfstate = i;
+            }
+        }
+        FOR(i, N) {
+            UF curuf(N);
+            bool cont = false;
+            FOR(i, N) {
+                if(uf.find(i) != i) {
+                    cont = true;
+                    break;
+                }
+            }
+            if(!cont) break;
+            FOR(q, N) {
+                FOR(qp, N) {
+                    if(uf.find(q) == uf.find(qp)) {
+                        bool ok = true;
+                        FOR(j, MAX_TRA) {
+                            if(uf.find(sa.aut[q][j]) != uf.find(sa.aut[qp][j])) {
+                                ok = false;
+                                break;
+                            }
+                        }
+                        if(ok) {
+                            curuf.unite(q, qp);
+                        }
+                    }
+                }
+            }
+            uf = curuf;
+        }
+        FOR(i, N) {
+            RC_ASSERT(uf.find(i) == i);
+        }
+    });
+
 }
 
