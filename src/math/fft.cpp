@@ -1,38 +1,25 @@
 const double PI = acos(-1);
 typedef complex<double> cpx;
 
+//-- Only for NTT. Include Fp.cpp --//
 //For NTT, use findNTTParams.py to find A and R
 const lli A = 12;
 const lli P = A*(1<<10) + 1; //prime number
 const lli R = 10302; //primitive root
 
-template<lli P>
-struct Fp {
-    lli n;
-    Fp() : n(0) {}
-    Fp(lli n_) : n(n_%P) {}
-    inline Fp operator+(Fp other) const { return Fp(n + other.n); }
-    inline Fp operator-(Fp other) const { return Fp(n - other.n + P); }
-    inline Fp operator*(Fp other) const { return Fp(n * other.n); }
-    inline Fp operator/(Fp other) const { return (*this) * other.pow(P-2); };
-    Fp pow(lli b) const {
-        if(b == 0) return Fp(1);
-        Fp rec = pow(b/2);
-        return b%2 == 0 ? rec*rec : (*this)*rec*rec;
-    };
-};
-
 template<typename T> void fillPrimRoots(T* vec, lli N, bool conj) {}
+
+template<> void fillPrimRoots<Fp<P>>(Fp<P>* vec, lli N, bool conj) {
+    Fp<P> primRoot(conj ? Fp<P>(1)/R : R);
+    vec[0] = 1;
+    FORU(i, 1, N/2) vec[i] = primRoot*vec[i-1];
+}
+
+//-- End of "Only for NTT" --//
 
 template<> void fillPrimRoots<cpx>(cpx* vec, lli N, bool conj) {
     double sign = conj ? -1 : 1;
     FOR(i, N/2) vec[i] = polar(1.0, sign * 2 * PI * i / N);
-}
-
-template<> void fillPrimRoots<Fp<P>>(Fp<P>* vec, lli N, bool conj) {
-    Fp<P> current(1), primRoot(R);
-    if(conj) primRoot = Fp<P>(1)/primRoot;
-    FOR(i, N/2) vec[i] = current, current = primRoot*current;
 }
 
 template<typename T>

@@ -1,5 +1,6 @@
 #include <precontest/template.cpp>
 #include <math/egcd.cpp>
+#include <math/Fp.cpp>
 #include <math/fft.cpp>
 #include <rapidcheck.h>
 

@@ -2,12 +2,9 @@ def checkMillerRabin(n, a):
     r = n-1
     while True:
         x = pow(a, r, n)
-        if x == n-1:
-            return True
-        if x != 1:
-            return False
-        if r%2 != 0:
-            return True
+        if x == n-1: return True
+        if x != 1: return False
+        if r%2 != 0: return True
         r = r//2
 
 def isPrime(n, l = [2,3,5,7,11,13,17,19,23,29,31]):
