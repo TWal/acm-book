@@ -2,7 +2,50 @@
 #include <math/egcd.cpp>
 #include <math/Fp.cpp>
 #include <math/fft.cpp>
+#include <math/gauss.cpp>
 #include <rapidcheck.h>
+
+const lli PR = 1000*1000*1000+7;
+
+template<typename T>
+static rc::Gen<vector<vector<T>>> getMatrix() {
+    return rc::gen::withSize([](int n) {
+        return rc::gen::container<vector<vector<T>>>(n, rc::gen::container<vector<T>>(n, rc::gen::arbitrary<double>()));
+    });
+}
+
+template<typename T>
+static rc::Gen<vector<T>> getVector() {
+    return rc::gen::withSize([](int n) {
+        return rc::gen::container<vector<T>>(n, rc::gen::arbitrary<double>());
+    });
+}
+
+
+template<>
+bool isZero<Fp<PR>>(Fp<PR> x) {
+    return x.n == 0;
+}
+
+ostream& operator<<(ostream& os, Fp<PR> f) {
+    os << f.n;
+    return os;
+}
+
+
+namespace rc {
+
+template<>
+struct Arbitrary<Fp<PR>> {
+    static Gen<Fp<PR>> arbitrary() {
+        return gen::build<Fp<PR>>(
+            gen::set(&Fp<PR>::n, rc::gen::inRange<lli>(0, PR))
+        );
+    }
+};
+
+} // namespace rc
+
 
 void testMath() {
     rc::check("egcd: gcd(a, b) divides a and b", [](lli a, lli b) {
@@ -106,6 +149,41 @@ void testMath() {
                 }
             }
             RC_ASSERT(Fp<P>(cur).n == cp[n].n);
+        }
+    });
+
+    rc::check("gauss_mod", []() {
+        using vf = vector<Fp<PR>>;
+        using vvf = vector<vector<Fp<PR>>>;
+        vvf matrix = *getMatrix<Fp<PR>>().as("matrix");
+        vf vec = *getVector<Fp<PR>>().as("vector");
+        const int size = *rc::gen::withSize([](int n) { return rc::gen::just(n); });
+        Gauss<Fp<PR>> gauss(size);
+        FOR(i, size) {
+            if(!gauss.add(matrix[i])) {
+                vf out;
+                RC_ASSERT(gauss.solve(matrix[i], out));
+                vf tmp(size, 0);
+                FOR(j, size) {
+                    FOR(k, size) tmp[k] = tmp[k] + out[j] * matrix[j][k];
+                }
+
+                FOR(j, size) {
+                    RC_ASSERT(matrix[i][j].n == tmp[j].n);
+                }
+            }
+        }
+        vf out;
+        if(!gauss.solve(vec, out)) return;
+
+        vf vec2(size, 0);
+
+        FOR(i, size) {
+            FOR(j, size) vec2[i] = vec2[i] + out[j] * matrix[j][i];
+        }
+
+        FOR(i, size) {
+            RC_ASSERT(vec[i].n == vec2[i].n);
         }
     });
 }
