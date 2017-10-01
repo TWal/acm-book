@@ -3,6 +3,7 @@
 #include <math/Fp.cpp>
 #include <math/fft.cpp>
 #include <math/gauss.cpp>
+#include <math/gauss_z2z.cpp>
 #include <rapidcheck.h>
 
 const lli PR = 1000*1000*1000+7;
@@ -10,14 +11,14 @@ const lli PR = 1000*1000*1000+7;
 template<typename T>
 static rc::Gen<vector<vector<T>>> getMatrix() {
     return rc::gen::withSize([](int n) {
-        return rc::gen::container<vector<vector<T>>>(n, rc::gen::container<vector<T>>(n, rc::gen::arbitrary<double>()));
+        return rc::gen::container<vector<vector<T>>>(n, rc::gen::container<vector<T>>(n, rc::gen::arbitrary<T>()));
     });
 }
 
 template<typename T>
 static rc::Gen<vector<T>> getVector() {
     return rc::gen::withSize([](int n) {
-        return rc::gen::container<vector<T>>(n, rc::gen::arbitrary<double>());
+        return rc::gen::container<vector<T>>(n, rc::gen::arbitrary<T>());
     });
 }
 
@@ -185,5 +186,50 @@ void testMath() {
         FOR(i, size) {
             RC_ASSERT(vec[i].n == vec2[i].n);
         }
+    });
+
+    rc::check("gauss_z2z", []() {
+        const lli N = 200;
+        vvb matrix = *rc::gen::resize(N, getMatrix<bool>().as("matrix"));
+        vb vec = *rc::gen::resize(N, getVector<bool>().as("vector"));
+        RC_PRE(vec.size() == N);
+        RC_PRE(matrix.size() == N);
+
+        vector<bitset<N>> bmatrix;
+        bmatrix.resize(N);
+        FOR(i, N) {
+            FOR(j, N) {
+                if(matrix[i][j]) bmatrix[i].set(j);
+            }
+        }
+        bitset<N> bvec;
+        FOR(i, N) {
+            if(vec[i]) bvec.set(i);
+        }
+
+        GaussZ2Z<N> gauss;
+        FOR(i, N) {
+            if(!gauss.add(bmatrix[i])) {
+                bitset<N> out;
+                RC_ASSERT(gauss.solve(bmatrix[i], out));
+                bitset<N> tmp;
+                FOR(j, N) {
+                    if(out[j]) tmp = tmp ^ bmatrix[j];
+                }
+
+                RC_ASSERT(bmatrix[i] == tmp);
+            }
+        }
+
+        bitset<N> out;
+        if(!gauss.solve(bvec, out)) return;
+
+        bitset<N> vec2;
+
+        FOR(i, N) {
+            if(out[i]) vec2 = vec2 ^ bmatrix[i];
+        }
+
+        RC_ASSERT(bvec == vec2);
     });
 }
