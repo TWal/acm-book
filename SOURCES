@@ -5,6 +5,8 @@ math/Fp.cpp: it uses Fermat's little theorem
 math/fft.cpp: https://github.com/antonkov/ITMOTeamBook/blob/master/fft/full.cpp
 math/gauss.cpp: old notebook
 math/gauss_z2z.cpp: old notebook
+math/walsh_hadamard.cpp: some programming bootcamp
+math/subset_sum.cpp: some programming bootcamp
 string/kmp.cpp: http://www.iti.fh-flensburg.de/lang/algorithmen/pattern/kmpen.htm
 string/zfunc.cpp: https://github.com/stjepang/snippets/blob/master/z_algorithm.cpp
 string/ahocorasick.cpp: original paper (http://cr.yp.to/bib/1975/aho.pdf)

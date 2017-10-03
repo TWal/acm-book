@@ -4,6 +4,8 @@
 #include <math/fft.cpp>
 #include <math/gauss.cpp>
 #include <math/gauss_z2z.cpp>
+#include <math/walsh_hadamard.cpp>
+#include <math/subset_sum.cpp>
 #include <rapidcheck.h>
 
 const lli PR = 1000*1000*1000+7;
@@ -231,5 +233,105 @@ void testMath() {
         }
 
         RC_ASSERT(bvec == vec2);
+    });
+
+    rc::check("wash_hadamard: inverse", []() {
+        int size = *rc::gen::withSize([](int n) { return rc::gen::just(n); });
+        while(size & (size-1)) ++size;
+        lli log2Size = 0;
+        while(size>>log2Size) ++log2Size;
+        lli bound = (1ll<<(63-log2Size));
+        vi v = *rc::gen::container<vi>((size_t)size, rc::gen::inRange<lli>(-bound, bound)).as("vector");
+        vi vSave = v;
+        hadamard(v, false);
+        hadamard(v, true);
+        RC_ASSERT(vSave == v);
+    });
+
+    rc::check("wash_hadamard: convolution", []() {
+        int size = *rc::gen::withSize([](int n) { return rc::gen::just(n); });
+        while(size & (size-1)) ++size;
+        lli log2Size = 0;
+        while(size>>log2Size) ++log2Size;
+        lli bound = (1ll<<((63-log2Size)/2-2));
+        auto vigen = rc::gen::container<vi>((size_t)size, rc::gen::inRange<lli>(-bound, bound));
+        vi v1 = *vigen.as("v1");
+        vi v2 = *vigen.as("v2");
+        vi goodConv(size, 0);
+        FOR(i, size) {
+            FOR(j, size) {
+                goodConv[i^j] += v1[i] * v2[j];
+            }
+        }
+        hadamard(v1, false);
+        hadamard(v2, false);
+        FOR(i, size) {
+            v1[i] *= v2[i];
+        }
+        hadamard(v1, true);
+        RC_ASSERT(v1 == goodConv);
+    });
+
+    rc::check("wash_hadamard: bound", []() {
+        int size = *rc::gen::withSize([](int n) { return rc::gen::just(n); });
+        while(size & (size-1)) ++size;
+        lli log2Size = 0;
+        while(size>>log2Size) ++log2Size;
+        lli bound = (1ll<<(63-log2Size));
+        vi v = *rc::gen::container<vi>((size_t)size, rc::gen::inRange<lli>(-bound, bound)).as("vector");
+        size_t realBound = 0;
+        FOR(i, size) realBound = max(realBound, (size_t)abs(v[i]));
+        hadamard(v, false);
+        FOR(i, size) {
+            RC_ASSERT((size_t)abs(v[i]) <= v.size()*realBound);
+        }
+    });
+
+    rc::check("subset_sum : subset sum", []() {
+        int size = *rc::gen::withSize([](int n) { return rc::gen::just(n); });
+        while(size & (size-1)) ++size;
+        vi v = *rc::gen::container<vi>((size_t)size, rc::gen::arbitrary<lli>()).as("vector");
+        vi sum(size, 0);
+        FOR(i, size) {
+            lli j = i;
+            //enumerate over subsets of i
+            do {
+                sum[i] += v[j];
+                j = (j-1)&i;
+            } while(j != i);
+        }
+        subsetSum(v, false);
+        RC_ASSERT(sum == v);
+    });
+
+    rc::check("subset_sum: inverse", []() {
+        int size = *rc::gen::withSize([](int n) { return rc::gen::just(n); });
+        while(size & (size-1)) ++size;
+        vi v = *rc::gen::container<vi>((size_t)size, rc::gen::arbitrary<lli>()).as("vector");
+        vi vSave = v;
+        subsetSum(v, false);
+        subsetSum(v, true);
+        RC_ASSERT(v == vSave);
+    });
+
+    rc::check("subset_sum: convolution", []() {
+        int size = *rc::gen::withSize([](int n) { return rc::gen::just(n); });
+        while(size & (size-1)) ++size;
+        auto vigen = rc::gen::container<vi>((size_t)size, rc::gen::arbitrary<lli>()).as("vector");
+        vi v1 = *vigen.as("v1");
+        vi v2 = *vigen.as("v2");
+        vi goodConv(size, 0);
+        FOR(i, size) {
+            FOR(j, size) {
+                goodConv[i|j] += v1[i] * v2[j];
+            }
+        }
+        subsetSum(v1, false);
+        subsetSum(v2, false);
+        FOR(i, size) {
+            v1[i] *= v2[i];
+        }
+        subsetSum(v1, true);
+        RC_ASSERT(v1 == goodConv);
     });
 }
