@@ -6,8 +6,10 @@
 #include <datastruct/lazysegtree.cpp>
 #include <datastruct/treap.cpp>
 #include <datastruct/treap_gensegtree.cpp>
+#include <datastruct/rmq.cpp>
 #include <rapidcheck.h>
 #include <rapidcheck/state.h>
+
 
 /*   _   _       _                    __ _           _
     | | | |_ __ (_) ___  _ __        / _(_)_ __   __| |
@@ -553,7 +555,7 @@ struct GenSegTreeQuery : rc::state::Command<DGST, GST*> {
     }
 };
 
-void testTreap() {
+static void testTreap() {
     rc::check("treap", []() {
         lli meh = 0;
         MyTreap* treap = new MyTreap(0);
@@ -569,10 +571,39 @@ void testTreap() {
     });
 }
 
+
+/*  ____  __  __  ___
+   |  _ \|  \/  |/ _ \
+   | |_) | |\/| | | | |
+   |  _ <| |  | | |_| |
+   |_| \_\_|  |_|\__\_\
+*/
+
+static void testRMQ() {
+    rc::check("RMQ", []() {
+        vi v = *rc::gen::arbitrary<vi>().as("vector");
+        RC_PRE(v.size() >= 1);
+
+        RMQ rmq(v);
+
+        FOR(l, v.size()) {
+            FORU(r, l+1, v.size()+1) {
+                lli rmqMin = rmq.query(l, r);
+                lli calcMin = v[l];
+                FORU(i, l, r) {
+                    calcMin = min(calcMin, v[i]);
+                }
+                RC_ASSERT(rmqMin == calcMin);
+            }
+        }
+    });
+}
+
 void testDatastruct() {
     testUF();
     testFenwick();
     testSegTree();
     testTreap();
+    testRMQ();
 }
 
