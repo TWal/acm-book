@@ -1,17 +1,17 @@
 syntax on
 filetype plugin on
-set colorcolumn=80 "cc
-set background=dark
-set number "nu
-set tabstop=4 "ts
-set shiftwidth=4 "sw
-set noexpandtab "noet
-set smartindent "si
-set hlsearch " Highlight search, hls
-set incsearch " Incremental search, is
-set ttimeoutlen=100 " Don't wait when doing <Esc>O, ttm
-set scrolloff=5 " 5 line above / below the cursor when scrolling, so
-set cursorline " Highlight where the cursor is, cul
+set cc=80 "colorcolumn
+set bg=dark "background
+set nu "number
+set ts=4 "tabstop
+set sw=4 "shiftwidth
+set et "expandtab
+set si "smartindent
+set hls "hlsearch
+set is "incsearch
+set ttm=100 " Don't wait when doing <Esc>O, ttimeoutlen
+set so=5 " 5 line above / below the cursor when scrolling, scrolloff
+set cul "cursorline
 xnoremap < <gv
 xnoremap > >gv
 noremap 0 ^
