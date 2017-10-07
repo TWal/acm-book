@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 
 project(BookTests)
-SET(CMAKE_CXX_FLAGS "-O2 -Wall -pedantic -std=c++14")
+SET(CMAKE_CXX_FLAGS "-Og -g -Wall -pedantic -std=c++14")
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
@@ -12,6 +12,7 @@ set(${PROJECT_NAME}_SOURCES
     src/datastruct.cpp
     src/flow.cpp
     src/graph.cpp
+    src/tree.cpp
 )
 add_subdirectory("rapidcheck")
 

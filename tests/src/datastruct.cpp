@@ -584,7 +584,7 @@ static void testRMQ() {
         vi v = *rc::gen::arbitrary<vi>().as("vector");
         RC_PRE(v.size() >= 1);
 
-        RMQ rmq(v);
+        RMQ<lli> rmq(v);
 
         FOR(l, v.size()) {
             FORU(r, l+1, v.size()+1) {

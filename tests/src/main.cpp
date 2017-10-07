@@ -3,6 +3,7 @@
 #include "datastruct.h"
 #include "flow.h"
 #include "graph.h"
+#include "tree.h"
 
 int main() {
     testMath();
@@ -10,5 +11,6 @@ int main() {
     testDatastruct();
     testFlow();
     testGraph();
+    testTree();
     return 0;
 }

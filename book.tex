@@ -44,6 +44,7 @@ String processing: page \pageref{string} \\
 Data structures: page \pageref{datastruct} \\
 Flows: page \pageref{flows} \\
 Graphs: page \pageref{graphs} \\
+Trees: page \pageref{trees} \\
 
 \noindent
 Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
@@ -165,5 +166,14 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 
 \subsubsection{Bridges / Arcs essentiels - $O(V + E)$}
 \lstinputlisting{src/graph/bridges.cpp}
+
+\subsection*{Trees}
+\label{trees}
+
+\subsubsection{LCA - $O(n \log n)$ preprocessing, $O(1)$ query}
+\lstinputlisting{src/tree/lca.cpp}
+
+\subsubsection{Dynamic LCA - $O(\log n)$ add, $O(\log n)$ query}
+\lstinputlisting{src/tree/lca_dyn.cpp}
 
 \end{document}
