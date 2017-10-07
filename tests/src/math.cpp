@@ -6,22 +6,19 @@
 #include <math/gauss_z2z.cpp>
 #include <math/walsh_hadamard.cpp>
 #include <math/subset_sum.cpp>
+#include <math/invPoly.cpp>
 #include <rapidcheck.h>
 
-const lli PR = 1000*1000*1000+7;
+const lli PR = 5;
 
 template<typename T>
-static rc::Gen<vector<vector<T>>> getMatrix() {
-    return rc::gen::withSize([](int n) {
-        return rc::gen::container<vector<vector<T>>>(n, rc::gen::container<vector<T>>(n, rc::gen::arbitrary<T>()));
-    });
+static rc::Gen<vector<vector<T>>> getMatrix(int size) {
+    return rc::gen::container<vector<vector<T>>>(size, rc::gen::container<vector<T>>(size, rc::gen::arbitrary<T>()));
 }
 
 template<typename T>
-static rc::Gen<vector<T>> getVector() {
-    return rc::gen::withSize([](int n) {
-        return rc::gen::container<vector<T>>(n, rc::gen::arbitrary<T>());
-    });
+static rc::Gen<vector<T>> getVector(int size) {
+    return rc::gen::container<vector<T>>(size, rc::gen::arbitrary<T>());
 }
 
 
@@ -120,7 +117,6 @@ void testMath() {
     });
 
     rc::check("fft: polynomial multiplication using fft (number theoretic)", []() {
-        const lli N = 1000*1000;
         auto vigen = rc::gen::container<vi>(rc::gen::inRange(0, 100));
         vi a = *vigen.as("a");
         vi b = *vigen.as("b");
@@ -158,17 +154,19 @@ void testMath() {
     rc::check("gauss_mod", []() {
         using vf = vector<Fp<PR>>;
         using vvf = vector<vector<Fp<PR>>>;
-        vvf matrix = *getMatrix<Fp<PR>>().as("matrix");
-        vf vec = *getVector<Fp<PR>>().as("vector");
         const int size = *rc::gen::withSize([](int n) { return rc::gen::just(n); });
+        vvf matrix = *getMatrix<Fp<PR>>(size).as("matrix");
+        vf vec = *getVector<Fp<PR>>(size).as("vector");
+        vf coefs = *getVector<Fp<PR>>(size).as("coefs");
+
         Gauss<Fp<PR>> gauss(size);
         FOR(i, size) {
             if(!gauss.add(matrix[i])) {
                 vf out;
                 RC_ASSERT(gauss.solve(matrix[i], out));
                 vf tmp(size, 0);
-                FOR(j, size) {
-                    FOR(k, size) tmp[k] = tmp[k] + out[j] * matrix[j][k];
+                FOR(j, gauss.V.size()) {
+                    FOR(k, size) tmp[k] = tmp[k] + out[j] * matrix[gauss.V[j]][k];
                 }
 
                 FOR(j, size) {
@@ -176,26 +174,52 @@ void testMath() {
                 }
             }
         }
-        vf out;
-        if(!gauss.solve(vec, out)) return;
 
-        vf vec2(size, 0);
+        //Check that a linear combination of the original vectors is solvable
+        {
+            vf comblin(size, Fp<PR>(0));
+            FOR(i, size) {
+                FOR(j, size) comblin[i] = comblin[i] + coefs[j] * matrix[j][i];
+            }
 
-        FOR(i, size) {
-            FOR(j, size) vec2[i] = vec2[i] + out[j] * matrix[j][i];
+            vf out;
+            RC_ASSERT(gauss.solve(comblin, out));
+            vf vec2(size, 0);
+            FOR(i, size) {
+                FOR(j, gauss.V.size()) {
+                    vec2[i] = vec2[i] + out[j] * matrix[gauss.V[j]][i];
+                }
+            }
+
+            FOR(i, size) {
+                RC_ASSERT(comblin[i].n == vec2[i].n);
+            }
         }
 
-        FOR(i, size) {
-            RC_ASSERT(vec[i].n == vec2[i].n);
+        //Try to solve a random vector
+        {
+            vf out;
+            if(!gauss.solve(vec, out)) return;
+
+            vf vec2(size, 0);
+
+            FOR(i, size) {
+                FOR(j, gauss.V.size()) {
+                    vec2[i] = vec2[i] + out[j] * matrix[gauss.V[j]][i];
+                }
+            }
+
+            FOR(i, size) {
+                RC_ASSERT(vec[i].n == vec2[i].n);
+            }
         }
     });
 
     rc::check("gauss_z2z", []() {
         const lli N = 200;
-        vvb matrix = *rc::gen::resize(N, getMatrix<bool>().as("matrix"));
-        vb vec = *rc::gen::resize(N, getVector<bool>().as("vector"));
-        RC_PRE(vec.size() == N);
-        RC_PRE(matrix.size() == N);
+        vvb matrix = *getMatrix<bool>(N).as("matrix");
+        vb vec = *getVector<bool>(N).as("vector");
+        vb comblin = *getVector<bool>(N).as("comblin");
 
         vector<bitset<N>> bmatrix;
         bmatrix.resize(N);
@@ -215,24 +239,38 @@ void testMath() {
                 bitset<N> out;
                 RC_ASSERT(gauss.solve(bmatrix[i], out));
                 bitset<N> tmp;
-                FOR(j, N) {
-                    if(out[j]) tmp = tmp ^ bmatrix[j];
+                FOR(j, gauss.V.size()) {
+                    if(out[j]) tmp ^= bmatrix[gauss.V[j]];
                 }
 
                 RC_ASSERT(bmatrix[i] == tmp);
             }
         }
 
-        bitset<N> out;
-        if(!gauss.solve(bvec, out)) return;
+        //Check that a linear combination of the original vectors is solvable
+        {
+            bitset<N> veccl, out, vec2;
+            FOR(i, N) if(comblin[i]) veccl ^= bmatrix[i];
+            RC_ASSERT(gauss.solve(veccl, out));
+            FOR(i, gauss.V.size()) {
+                if(out[i]) vec2 ^= bmatrix[gauss.V[i]];
+            }
 
-        bitset<N> vec2;
-
-        FOR(i, N) {
-            if(out[i]) vec2 = vec2 ^ bmatrix[i];
+            RC_ASSERT(veccl == vec2);
         }
 
-        RC_ASSERT(bvec == vec2);
+        //Try to solve a random vector
+        {
+            bitset<N> out;
+            if(!gauss.solve(bvec, out)) return;
+
+            bitset<N> vec2;
+            FOR(i, gauss.V.size()) {
+                if(out[i]) vec2 ^= bmatrix[gauss.V[i]];
+            }
+
+            RC_ASSERT(bvec == vec2);
+        }
     });
 
     rc::check("wash_hadamard: inverse", []() {
@@ -253,7 +291,7 @@ void testMath() {
         while(size & (size-1)) ++size;
         lli log2Size = 0;
         while(size>>log2Size) ++log2Size;
-        lli bound = (1ll<<((63-log2Size)/2-2));
+        lli bound = (1ll<<((63-3*log2Size)/2));
         auto vigen = rc::gen::container<vi>((size_t)size, rc::gen::inRange<lli>(-bound, bound));
         vi v1 = *vigen.as("v1");
         vi v2 = *vigen.as("v2");

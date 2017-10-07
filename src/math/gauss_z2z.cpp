@@ -3,6 +3,7 @@ struct GaussZ2Z {
     bitset<N> A[N]; // upper diagonal matrix (free family)
     bitset<N> B[N]; // how elements of A are generated
     lli id;
+    vi V; //indices of the free vectors
 
     GaussZ2Z() { reset(); }
 
@@ -10,6 +11,7 @@ struct GaussZ2Z {
         id = 0;
         FOR(i, N) A[i].reset();
         FOR(i, N) B[i].reset();
+        V.clear();
     }
 
     lli solve__(bitset<N>& x, bitset<N>& y) {
@@ -26,6 +28,7 @@ struct GaussZ2Z {
     }
 
     //Solve the linear system, give the linear combination in y
+    //If m[i] is the i'th vector given in `add`, then x = sum_i y[i]*m[V[i]]
     bool solve(bitset<N> x, bitset<N>& y) { //You want to pass `x` by copy.
         return solve__(x, y) == N;
     }
@@ -33,13 +36,14 @@ struct GaussZ2Z {
     //Add a vector in the free family. Return true if this vector is not a
     //linear combination of the previous vectors
     bool add(bitset<N> x) { //You want to pass `x` by copy.
-        assert(id < N);
+        if(V.size() == N) return false;
         bitset<N> y;
         lli k = solve__(x, y);
         if(k < N) {
             A[k] = x;
-            y.flip(id);
+            y.flip(V.size());
             B[k] = y;
+            V.pb(id);
         }
         ++id;
         return k < N;

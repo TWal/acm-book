@@ -15,6 +15,7 @@ struct Gauss {
     lli N, id;
     //A = upper diagonal matrix (free family), B = how elements of A are generated
     vvt A, B;
+    vi V; //indices of the free vectors
 
     Gauss(lli N) { reset(N); }
 
@@ -22,6 +23,7 @@ struct Gauss {
         N = N_, id = 0;
         A.assign(N, vt(N, 0));
         B.assign(N, vt(N, 0));
+        V.clear();
     }
 
     lli solve__(vt& x, vt& y) {
@@ -40,6 +42,7 @@ struct Gauss {
     }
 
     //Solve the linear system, give the linear combination in y
+    //If m[i] is the i'th vector given in `add`, then x = sum_i y[i]*m[V[i]]
     bool solve(vt x, vt& y) { //You want to pass `x` by copy. Don't try to optimize
         return solve__(x, y) == N;
     }
@@ -47,12 +50,13 @@ struct Gauss {
     //Add a vector in the free family. Return true if this vector is not a
     //linear combination of the previous vectors
     bool add(vt x) { //You want to pass `x` by copy. Don't try to optimize
-        assert(id < N && x.size() == N);
+        if(V.size() == N) return false;
         vt y;
         lli k = solve__(x, y);
         if(k < N) {
             A[k] = x;
-            FOR(j, N) B[k][j] = T(j == id) - y[j];
+            FOR(j, N) B[k][j] = T(j == V.size()) - y[j];
+            V.pb(id);
         }
         ++id;
         return k < N;
