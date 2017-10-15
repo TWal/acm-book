@@ -1,34 +1,26 @@
 struct SuffixArray {
-    lli n, gap;
+    lli n;
     //sa = suffix array, pos = inverse of sa
     vi sa, pos, lcp; //lcp[i] = longest common prefix of sa[i], sa[i+1]
+    vector<pair<pii, lli>> v;
 
-    struct Compare {
-        const SuffixArray& s;
-        Compare(const SuffixArray& s) : s(s) {}
-        bool operator()(int i, int j) const {
-            if (s.pos[i] != s.pos[j]) return s.pos[i] < s.pos[j];
-            i += s.gap;
-            j += s.gap;
-            return i < s.n && j < s.n ? s.pos[i] < s.pos[j] : i > j;
+    SuffixArray(const string& s) : n(s.size()), sa(n), lcp(n-1), pos(n+1), v(n+1) {
+        FOR(i, n+1) pos[i] = (i != n) ? s[i] : 0;
+        for(lli k = 1; k <= n; k *= 2) {
+            FOR(i, n+1) v[i] = mp(mp(pos[i], pos[(i+k) % (n+1)]), i);
+            sort(v.begin(), v.end());
+            lli cnt = 0;
+            FORU(i, 1, n+1) {
+                if (v[i-1].fst != v[i].fst) ++cnt;
+                pos[v[i].snd] = cnt;
+            }
+            if(cnt ==  n) break;
         }
-    };
-
-    SuffixArray(const string& s) : n(s.size()), sa(n), pos(n), lcp(n-1) {
-        vi tmp(n);
-        FOR(i, n) {
-            sa[i] = i;
-            pos[i] = s[i];
-        }
-        Compare cmp(*this);
-
-        for(gap = 1; gap <= n; gap *= 2) {
-            sort(sa.begin(), sa.end(), cmp);
-            FORU(i, 1, n) tmp[i] = tmp[i - 1] + cmp(sa[i - 1], sa[i]);
-            FOR(i, n) pos[sa[i]] = tmp[i];
-        }
+        FOR(i, n) sa[i] = v[i+1].snd;
 
         //build lcp, can be removed if you don't need it
+        pos.pop_back();
+        FOR(i, n) pos[sa[i]] = i;
         lli k = 0;
         FOR(i, n) {
             if(pos[i]+1 != n) {

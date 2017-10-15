@@ -11,7 +11,10 @@
 #define W(A) get<3>(A)
 
 #define mt make_tuple
+#define mp make_pair
 #define pb push_back
+#define fst first
+#define snd second
 
 
 
