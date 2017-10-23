@@ -12,10 +12,12 @@ static rc::Gen<T> getGraph() {
             T graph(n, 0, n-1);
             lli k = 0;
             FOR(i, n) {
-                FOR(j, n) {
+                FORU(j, i+1, n) {
                     if(i == j) continue;
-                    lli c = v[k++];
-                    graph.addEdge(i, j, c);
+                    lli c1 = v[k++];
+                    lli c2 = v[k++];
+                    graph.addEdge(i, j, c1, 0);
+                    graph.addEdge(j, i, 0, c2);
                 }
             }
             return graph;
@@ -30,11 +32,8 @@ static rc::Gen<T> getGraph() {
     FOR(i, N) {                        \
         FOR(k, g.adj[i].size()) {      \
             Edge e = g.e[g.adj[i][k]]; \
-            if(e.c > 0) {              \
-                RC_ASSERT(e.f <= e.c); \
-                flows[i] -= e.f;       \
-                flows[e.to] += e.f;    \
-            }                          \
+            RC_ASSERT(e.f <= e.c);     \
+            flows[i] -= e.f;           \
         }                              \
     }                                  \
     FOR(i, N) {                        \

@@ -1,9 +1,5 @@
 struct Edge {
-    Edge(lli to_, lli c_, lli cost_) : to(to_), c(c_), f(0), cost(cost_) {}
-    lli to;
-    lli c; //capacity
-    lli f; //flow
-    lli cost;
+    lli to, f, c, cost; //f = flow, c = capacity
 };
 
 struct Graph {
@@ -11,11 +7,10 @@ struct Graph {
     vvi adj;
     lli s, t;
     Graph(lli n, lli s_, lli t_) : e(), adj(n), s(s_), t(t_) {}
-    lli addEdge(lli a, lli b, lli c, lli cost = 0) {
-        lli res = e.size();
-        e.pb(Edge(b, c, cost)); e.pb(Edge(a, 0, -cost));
-        adj[a].pb(res); adj[b].pb(res+1);
-        return res;
+    lli addEdge(lli a, lli b, lli c1, lli c2 = 0, lli cost = 0) {
+        adj[a].pb(e.size()); e.pb(Edge{b, 0, c1, cost});
+        adj[b].pb(e.size()); e.pb(Edge{a, 0, c2, -cost});
+        return adj[a].back();
     }
     vb minCut() {
         struct Dfs { //I use a struct because std::function has a huge constant

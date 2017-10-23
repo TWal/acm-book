@@ -2,22 +2,19 @@ struct Dinic : public Graph {
     vi d, w;
     Dinic(lli n, lli s, lli t) : Graph(n, s, t) {}
     lli dfs(lli v, lli f) {
-        if(v == t) return f;
-        lli cf = 0;
+        if(v == t || f == 0) return f;
         for(; w[v] < (lli)adj[v].size(); w[v]++) {
             lli k = adj[v][w[v]];
             Edge& ed = e[k];
-            if(ed.c > ed.f && d[ed.to] == d[v] + 1){
-                lli df = dfs(ed.to, min(f, ed.c - ed.f));
-                if(df > 0){
-                    cf += df;
-                    f -= df;
+            if(ed.c > ed.f && d[ed.to] == d[v]+1) {
+                if(lli df = dfs(ed.to, min(f, ed.c - ed.f))) {
                     ed.f += df;
                     e[k^1].f -= df;
+                    return df;
                 }
             }
         }
-        return cf;
+        return 0;
     }
 
     lli flow() {
@@ -39,8 +36,7 @@ struct Dinic : public Graph {
             }
             if(d[t] == -1) return f;
             w.assign(N, 0);
-            f += dfs(s, (1ll<<62));
-            assert(dfs(s, (1ll<<62)) == 0); //we can remove this
+            while(lli df = dfs(s, (1ll<<62))) f += df;
         }
         return f;
     }
