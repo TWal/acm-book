@@ -3,6 +3,7 @@
 #include <datastruct/rmq.cpp>
 #include <tree/lca.cpp>
 #include <tree/lca_dyn.cpp>
+#include <tree/heavy_light.cpp>
 #include <rapidcheck.h>
 
 lli mod(lli a, lli b) {
@@ -38,6 +39,15 @@ static rc::Gen<vi> getTree() {
             return rc::gen::just(res2);
         });
     });
+}
+
+static lli getRoot(const vi& tree) {
+    FOR(i, tree.size()) {
+        if(tree[i] == i) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 struct ConnectedChecker {
@@ -157,6 +167,73 @@ void testTree() {
                         }
                     }
                 }
+            }
+        }
+    });
+
+    rc::check("heavy_light: variables are coherent", []() {
+        vi tree = *getTree().as("tree");
+        RC_PRE(tree.size() >= 1);
+        lli root = getRoot(tree);
+        bool rootType = *rc::gen::arbitrary<bool>().as("rootType");
+        if(rootType) tree[root] = -1;
+        HLD hld(tree, root);
+
+        FOR(i, tree.size()) {
+            RC_ASSERT(0 <= hld.chain[i] && hld.chain[i] < hld.nchain);
+            RC_ASSERT(0 <= hld.pos[i] && hld.pos[i] < hld.size[hld.chain[i]]);
+        }
+
+        vvi chains(hld.nchain);
+        FOR(i, hld.nchain) {
+            chains[i].resize(hld.size[i], -1);
+        }
+        FOR(i, tree.size()) {
+            lli& val = chains[hld.chain[i]][hld.pos[i]];
+            RC_ASSERT(val == -1);
+            val = i;
+        }
+        FOR(i, hld.nchain) FOR(j, hld.size[i]) {
+            RC_ASSERT(chains[i][j] >= 0);
+            if(j == 0) {
+                RC_ASSERT(chains[i][j] == hld.head[i]);
+            } else {
+                RC_ASSERT(chains[i][j-1] == tree[chains[i][j]]);
+            }
+        }
+    });
+
+    rc::check("heavy_light: at most log2(n)+1 chain from node to root", []() {
+        vi tree = *getTree().as("tree");
+        RC_PRE(tree.size() >= 1);
+        lli root = getRoot(tree);
+        bool rootType = *rc::gen::arbitrary<bool>().as("rootType");
+        if(rootType) tree[root] = -1;
+        HLD hld(tree, root);
+
+        lli log2 = 1;
+        while((1<<log2) < tree.size()) ++log2;
+
+        FOR(i, tree.size()) {
+            lli cnt = 0;
+            lli node = i;
+            while(node != root && node >= 0) {
+                node = tree[hld.head[hld.chain[node]]];
+                ++cnt;
+            }
+            RC_ASSERT(cnt <= log2+1);
+        }
+    });
+
+    rc::check("heavy_light: lca is correct", []() {
+        vi tree = *getTree().as("tree");
+        RC_PRE(tree.size() >= 1);
+        lli root = getRoot(tree);
+        HLD hld(tree, root);
+        DummyLCA dlca(tree);
+        FOR(i, tree.size()) {
+            FOR(j, tree.size()) {
+                RC_ASSERT(hld.lca(i, j) == dlca.query(i, j));
             }
         }
     });
