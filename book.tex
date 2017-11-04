@@ -33,6 +33,10 @@
 \renewcommand{\headrulewidth}{0.1pt}
 \renewcommand{\footrulewidth}{0pt}
 
+\renewcommand{\line}{\noindent\rule{\linewidth}{1pt}}
+\newcommand{\algosection}[1]{\line \subsection*{#1}}
+\newcommand{\algorithm}[1]{\line \subsubsection*{#1}}
+
 \begin{document}
 
 \footnotesize
@@ -50,144 +54,142 @@ Misc: page \pageref{misc}
 \noindent
 Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 
-\subsection*{Pre-contest}
+\algosection{Pre-contest}
 \label{precontest}
 
-\subsubsection{.vimrc}
+\algorithm{.vimrc}
 \lstinputlisting[language={}]{src/precontest/vimrc}
 
-\subsubsection*{.bashrc}
+\algorithm{.bashrc}
 \lstinputlisting[language=bash]{src/precontest/bashrc}
 
-\subsubsection*{comp.sh}
+\algorithm{comp.sh}
 \lstinputlisting[language=bash]{src/precontest/comp.sh}
 
-\subsubsection{template.cpp}
+\algorithm{template.cpp}
 \lstinputlisting{src/precontest/template.cpp}
 
-
-
-\subsection*{Math}
+\algosection{Math}
 \label{math}
 
-\subsubsection{Extended GCD - $O(\log(\min(a, b)))$}
+\algorithm{Extended GCD - $O(\log(\min(a, b)))$}
 \lstinputlisting{src/math/egcd.cpp}
 
-\subsubsection{Field $\mathbb F_p$ or group $\mathbb Z/n\mathbb Z$}
+\algorithm{Field $\mathbb F_p$ or group $\mathbb Z/n\mathbb Z$}
 \lstinputlisting{src/math/Fp.cpp}
 
-\subsubsection{FFT / NTT / Polynomial multiplication - $O(n \log n)$}
+\algorithm{FFT / NTT / Polynomial multiplication - $O(n \log n)$}
 \lstinputlisting{src/math/fft.cpp}
 
-\subsubsection{Utility to find NTT parameters}
+\algorithm{Utility to find NTT parameters}
 \lstinputlisting[language=python]{src/math/findNTTParams.py}
 
-\subsubsection{Gauss - Solve linear system - Calculate matrix rank - $O(n^3)$}
+\algorithm{Gauss - Solve linear system - Calculate matrix rank - $O(n^3)$}
 \lstinputlisting{src/math/gauss.cpp}
 
-\subsubsection{Gauss in $\mathbb Z/2\mathbb Z$ - $O(n^3)$ (really good constant)}
+\algorithm{Gauss in $\mathbb Z/2\mathbb Z$ - $O(n^3)$ (really good constant)}
 \lstinputlisting{src/math/gauss_z2z.cpp}
 
-\subsubsection{Walsh-Hadamard transform - xor convolution - $O(n \log n)$}
+\algorithm{Walsh-Hadamard transform - xor convolution - $O(n \log n)$}
 \lstinputlisting{src/math/walsh_hadamard.cpp}
 
-\subsubsection{Subset sum transform - or convolution - $O(n \log n)$}
+\algorithm{Subset sum transform - or convolution - $O(n \log n)$}
 \lstinputlisting{src/math/subset_sum.cpp}
 
-\subsection*{String processing}
+\algosection{String processing}
 \label{string}
 
-\subsubsection{KMP - $O(m+n)$}
+\algorithm{KMP - $O(m+n)$}
 \lstinputlisting{src/string/kmp.cpp}
 
-\subsubsection{Z function - $O(n)$}
+\algorithm{Z function - $O(n)$}
 \lstinputlisting{src/string/zfunc.cpp}
 
-\subsubsection{Aho-Corasick - linear}
+\algorithm{Aho-Corasick - linear}
 \lstinputlisting{src/string/ahocorasick.cpp}
 
-\subsubsection{Suffix automaton - $O(n)$}
+\algorithm{Suffix automaton - $O(n)$}
 \lstinputlisting{src/string/suffixautomaton.cpp}
 
-\subsubsection{Suffix array \& LCP - $O(n \log(n)^2)$}
+\algorithm{Suffix array \& LCP - $O(n \log(n)^2)$}
 \lstinputlisting{src/string/suffixarray.cpp}
 
-\subsection*{Data structures}
+\algosection{Data structures}
 \label{datastruct}
 
-\subsubsection{Union-find - amortized $O(\log(n))$}
+\algorithm{Union-find - amortized $O(\log(n))$}
 \lstinputlisting{src/datastruct/unionfind.cpp}
 
-\subsubsection{Fenwick tree - $O(\log(n))$ add / get}
+\algorithm{Fenwick tree - $O(\log(n))$ add / get}
 \lstinputlisting{src/datastruct/fenwick.cpp}
 
-\subsubsection{Fenwick tree with range update - $O(\log(n))$ add / addRange / get}
+\algorithm{Fenwick tree with range update - $O(\log(n))$ add / addRange / get}
 \lstinputlisting{src/datastruct/fenwick_range.cpp}
 
-\subsubsection{Segment tree - $O(\log(n))$ modify / inc / query}
+\algorithm{Segment tree - $O(\log(n))$ modify / inc / query}
 \lstinputlisting{src/datastruct/segtree.cpp}
 
-\subsubsection{Lazy Segment tree - $O(\log(n))$ range add / query}
+\algorithm{Lazy Segment tree - $O(\log(n))$ range add / query}
 \lstinputlisting{src/datastruct/lazysegtree.cpp}
 
-\subsubsection{Treap - Augmentable binary search tree - $O(\log(n))$ insert / split / merge}
+\algorithm{Treap - Augmentable binary search tree - $O(\log(n))$ insert / split / merge}
 \lstinputlisting{src/datastruct/treap.cpp}
 
-\subsubsection{Generic segment tree - Example of treap augmentation - $O(\log(n))$ insert / query / add}
+\algorithm{Generic segment tree - Example of treap augmentation - $O(\log(n))$ insert / query / add}
 \lstinputlisting{src/datastruct/treap_gensegtree.cpp}
 
-\subsubsection{RMQ - $O(n \log n)$ initialization - $O(1)$ query}
+\algorithm{RMQ - $O(n \log n)$ initialization - $O(1)$ query}
 \lstinputlisting{src/datastruct/rmq.cpp}
 
-\subsection*{Flows}
+\algosection{Flows}
 \label{flows}
 
-\subsubsection{Common graph structure}
+\algorithm{Common graph structure}
 \lstinputlisting{src/flow/graph.cpp}
 
-\subsubsection{Dinic - $O(V^2 E)$}
+\algorithm{Dinic - $O(V^2 E)$}
 \lstinputlisting{src/flow/dinic.cpp}
 
-\subsubsection{Capacity Scaling - $O(E^2 \log(C))$ ($C$ = capacité max)}
+\algorithm{Capacity Scaling - $O(E^2 \log(C))$ ($C$ = capacité max)}
 \lstinputlisting{src/flow/cap_scaling.cpp}
 
 
 
-\subsection*{Graphs}
+\algosection{Graphs}
 \label{graphs}
 
-\subsubsection{Strongly connected component Tarjan - $O(V + E)$}
+\algorithm{Strongly connected component Tarjan - $O(V + E)$}
 \lstinputlisting{src/graph/scc_tarjan.cpp}
 
-%\subsubsection{Strongly connected component Kosaraju - $O(V + E)$}
+%\algorithm{Strongly connected component Kosaraju - $O(V + E)$}
 %\lstinputlisting{src/graph/scc_kosaraju.cpp}
 
-\subsubsection{Articulation points / N\oe uds essentiels - $O(V + E)$}
+\algorithm{Articulation points / N\oe uds essentiels - $O(V + E)$}
 \lstinputlisting{src/graph/articulation.cpp}
 
-\subsubsection{Bridges / Arcs essentiels - $O(V + E)$}
+\algorithm{Bridges / Arcs essentiels - $O(V + E)$}
 \lstinputlisting{src/graph/bridges.cpp}
 
-\subsection*{Trees}
+\algosection{Trees}
 \label{trees}
 
-\subsubsection{LCA - $O(n \log n)$ preprocessing, $O(1)$ query}
+\algorithm{LCA - $O(n \log n)$ preprocessing, $O(1)$ query}
 \lstinputlisting{src/tree/lca.cpp}
 
-\subsubsection{Dynamic LCA - $O(\log n)$ add, $O(\log n)$ query}
+\algorithm{Dynamic LCA - $O(\log n)$ add, $O(\log n)$ query}
 \lstinputlisting{src/tree/lca_dyn.cpp}
 
-\subsubsection{Heavy-Light decomposition - $O(n)$ build, $O(\log n)$ LCA}
+\algorithm{Heavy-Light decomposition - $O(n)$ build, $O(\log n)$ LCA}
 \lstinputlisting{src/tree/heavy_light.cpp}
 
 
-\subsection*{Misc}
+\algosection{Misc}
 \label{misc}
 
-\subsubsection{LIS (Longest Increasing Subsequence) - $O(n \log n)$}
+\algorithm{LIS (Longest Increasing Subsequence) - $O(n \log n)$}
 \lstinputlisting{src/misc/lis_full.cpp}
 
-\subsubsection{Size of LIS - $O(n \log n)$}
+\algorithm{Size of LIS - $O(n \log n)$}
 \lstinputlisting{src/misc/lis_short.cpp}
 
 \end{document}
