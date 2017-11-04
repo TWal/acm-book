@@ -1,24 +1,18 @@
-//returns the indices of the longest increasing subsequence of `v`
+// Returns the indices of the longest increasing subsequence of v
 vi lis(const vi& v) {
-    lli n = v.size();
-    vi p(n, 0), m(n+1, 0);
-    lli l = 0;
-    FOR(i, n) {
-        lli beg = 1, end = l;
-        while(beg <= end) {
-            lli mid = (beg+end)/2;
-            if(v[m[mid]] < v[i]) beg = mid+1;
-            else end = mid-1;
-        }
-        p[i] = m[beg-1];
-        m[beg] = i;
-        l = max(l, beg);
+    lli n = v.size(), c = 0;
+    vi b(n), p(n), ans;
+    for (int i = 0; i < n; ++i) {
+        // Longest nondecreasing subsequence: replace with upper_bound
+        p[i] = lower_bound(b.begin(), b.begin() + c, v[i]) - b.begin() + 1;
+        b[p[i] - 1] = v[i];
+        c = max(c, p[i]);
     }
-    vi res(l);
-    lli k = m[l];
-    FOR(i, l) {
-        res[l-i-1] = k;
-        k = p[k];
+    for (int i = n - 1; i >= 0; --i) if (p[i] == c) {
+        ans.pb(i);
+        c--;
     }
-    return res;
+    reverse(ans.begin(), ans.end());
+    return ans;
 }
+
