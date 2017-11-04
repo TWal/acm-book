@@ -4,6 +4,7 @@
 #include "flow.h"
 #include "graph.h"
 #include "tree.h"
+#include "misc.h"
 
 int main() {
     testMath();
@@ -12,5 +13,6 @@ int main() {
     testFlow();
     testGraph();
     testTree();
+    testMisc();
     return 0;
 }

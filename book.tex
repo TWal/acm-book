@@ -45,6 +45,7 @@ Data structures: page \pageref{datastruct} \\
 Flows: page \pageref{flows} \\
 Graphs: page \pageref{graphs} \\
 Trees: page \pageref{trees} \\
+Misc: page \pageref{misc}
 
 \noindent
 Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
@@ -178,5 +179,17 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 
 \subsubsection{Heavy-Light decomposition - $O(n)$ build, $O(\log n)$ LCA}
 \lstinputlisting{src/tree/heavy_light.cpp}
+
+
+\subsection*{Misc}
+\label{misc}
+
+\subsubsection{LIS (Longest Increasing Subsequence) - $O(n \log n)$}
+\lstinputlisting{src/misc/lis_full.cpp}
+
+\subsubsection{Size of LIS - $O(n \log n)$}
+\lstinputlisting{src/misc/lis_short.cpp}
+
+\end{document}
 
 \end{document}

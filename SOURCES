@@ -27,3 +27,5 @@ graph/bridges.cpp: adapted from articulation.cpp
 tree/lca.cpp: https://www.topcoder.com/community/data-science/data-science-tutorials/range-minimum-query-and-lowest-common-ancestor/#Reduction%20from%20LCA%20to%20RMQ
 tree/lca_dyn.cpp: https://www.topcoder.com/community/data-science/data-science-tutorials/range-minimum-query-and-lowest-common-ancestor/#Another%20easy%20solution%20in%20O(N%20logN,%20O(logN)
 tree/heavy_light.cpp : https://blog.anudeep2011.com/heavy-light-decomposition/ https://github.com/stjepang/snippets/blob/master/heavy_light.cpp
+misc/lca_short.cpp: a submission of md5 on codeforces
+misc/lca_full.cpp: wikipedia
