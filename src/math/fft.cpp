@@ -1,41 +1,38 @@
 const double PI = acos(-1);
 typedef complex<double> cpx;
 
+template<typename T> T kthRoot(lli k, lli N) {}
+
+template<> cpx kthRoot<cpx>(lli k, lli N) {
+    return polar(1.0, 2*PI*k/N);
+}
+
 //-- Only for NTT. Include Fp.cpp --//
 //For NTT, use findNTTParams.py to find A and R
 const lli A = 12;
 const lli P = A*(1<<10) + 1; //prime number
 const lli R = 10302; //primitive root
 
-template<typename T> void fillPrimRoots(T* vec, lli N, bool conj) {}
-
-template<> void fillPrimRoots<Fp<P>>(Fp<P>* vec, lli N, bool conj) {
-    Fp<P> primRoot(conj ? Fp<P>(1)/R : R);
-    vec[0] = 1;
-    FORU(i, 1, N/2) vec[i] = primRoot*vec[i-1];
+template<> Fp<P> kthRoot<Fp<P>>(lli k, lli N) {
+    return Fp<P>(R).pow(k);
 }
 
 //-- End of "Only for NTT" --//
 
-template<> void fillPrimRoots<cpx>(cpx* vec, lli N, bool conj) {
-    double sign = conj ? -1 : 1;
-    FOR(i, N/2) vec[i] = polar(1.0, sign * 2 * PI * i / N);
-}
-
 template<typename T>
 struct FFT {
-    lli base;
-    lli N;
+    lli base, N;
     vector<T> rt;
-    vector<T> rtconj;
     vi rev;
-    FFT(lli _base) : base(_base), N(1<<_base), rt(N, 0), rtconj(N), rev(N) {
+    FFT(lli _base) : base(_base), N(1<<_base), rt(N, 0), rev(N) {
         FOR(i, N) rev[i] = (rev[i >> 1] >> 1) + ((i&1) << (base-1));
-        fillPrimRoots<T>(rt.data() + N/2, N, false);
-        fillPrimRoots<T>(rtconj.data() + N/2, N, true);
-        FORD(i, 0, N/2) {
-            rt[i]     = rt[2*i];
-            rtconj[i] = rtconj[2*i];
+        rt[1] = 1;
+        FORU(k, 1, base) {
+            T w = kthRoot<T>(N>>(k+1), N);
+            FORU(i, 1<<(k-1), (1<<k)) {
+                rt[2*i] = rt[i];
+                rt[2*i+1] = rt[i]*w;
+            }
         }
     }
 
@@ -45,10 +42,10 @@ struct FFT {
     }
 
     void fft(T* a,  bool inv = false) const {
-        const T* roots = inv ? rtconj.data() : rt.data();
+        if(inv) reverse(a+1, a+N);
         FOR(i, N) if(i < rev[i]) swap(a[i], a[rev[i]]);
         for(lli k = 1; k < N; k <<= 1) for(lli i = 0; i < N; i += 2*k) FOR(j, k) {
-            T z = a[i+j+k] * roots[j+k];
+            T z = a[i+j+k] * rt[j+k];
             a[i+j+k] = a[i+j] - z;
             a[i+j]   = a[i+j] + z;
         }
@@ -58,12 +55,11 @@ struct FFT {
 
     template<typename U>
     void pad(vector<U>& a) const {
-        a.reserve(N);
-        while(a.size() < N) a.pb(0);
+        a.resize(N, 0);
     }
 };
 
-//Fast FFT multiplication using complex numbers
+// "2 in 1" FFT polynomial multiplication
 vi multFFT(const FFT<cpx>& fft, const vi& a, const vi& b) {
     lli N = fft.N;
     assert(a.size() == N && b.size() == N);
