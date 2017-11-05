@@ -6,7 +6,9 @@
 #include <math/gauss_z2z.cpp>
 #include <math/walsh_hadamard.cpp>
 #include <math/subset_sum.cpp>
-#include <math/invPoly.cpp>
+#include <math/opmod.cpp>
+#include <math/pollard_rho.cpp>
+#include <math/miller_rabin.cpp>
 #include <rapidcheck.h>
 
 const lli PR = 5;
@@ -371,5 +373,48 @@ void testMath() {
         }
         subsetSum(v1, true);
         RC_ASSERT(v1 == goodConv);
+    });
+
+    rc::check("multmod: check correctness with 32 bit value", []() {
+        llu a = *rc::gen::arbitrary<unsigned int>().as("a");
+        llu b = *rc::gen::arbitrary<unsigned int>().as("b");
+        llu m = *rc::gen::arbitrary<unsigned int>().as("m");
+        RC_PRE(m > 0);
+        RC_ASSERT((a*b)%m == multmod(a, b, m));
+    });
+
+    rc::check("multmod: uint128 version", []() {
+        llu a = *rc::gen::arbitrary<llu>().as("a");
+        llu b = *rc::gen::arbitrary<llu>().as("b");
+        llu m = *rc::gen::arbitrary<llu>().as("m");
+        RC_PRE(m > 0);
+        RC_ASSERT(multmodInt128(a, b, m) == multmod(a, b, m));
+    });
+
+    rc::check("pollard_rho", []() {
+        llu a = *rc::gen::arbitrary<unsigned int>().as("a");
+        llu b = *rc::gen::arbitrary<unsigned int>().as("b");
+        RC_PRE(a >= 2);
+        RC_PRE(b >= 2);
+        llu n = a*b;
+        llu factor = pollardrho(n);
+        RC_ASSERT(factor != 1 && factor != n && n%factor == 0);
+    });
+
+    rc::check("miller_rabin", []() {
+        llu n = *rc::gen::arbitrary<unsigned int>().as("n");
+        bool dumbIsPrime;
+        if(n < 2) {
+            dumbIsPrime = false;
+        } else {
+            dumbIsPrime = true;
+            for(llu i = 2; i*i <= n; ++i) {
+                if(n%i == 0) {
+                    dumbIsPrime = false;
+                    break;
+                }
+            }
+        }
+        RC_ASSERT(dumbIsPrime == isPrime(n));
     });
 }

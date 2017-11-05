@@ -20,6 +20,7 @@
 
 using namespace std;
 using lli = long long int;
+using llu = unsigned long long int;
 
 using pii   = tuple<lli, lli>;
 using piii  = tuple<lli, lli, lli>;

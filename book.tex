@@ -96,6 +96,15 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \algorithm{Subset sum transform - or convolution - $O(n \log n)$}
 \lstinputlisting{src/math/subset_sum.cpp}
 
+\algorithm{Modular operations on $\texttt{llu}$ (without overflow)}
+\lstinputlisting{src/math/opmod.cpp}
+
+\algorithm{Pollard's rho (number factorization) - $O(n^{\frac{1}{4}})$ in expectation}
+\lstinputlisting{src/math/pollard_rho.cpp}
+
+\algorithm{Miller-rabin (primality test) - $O(\log(n))$}
+\lstinputlisting{src/math/miller_rabin.cpp}
+
 \algosection{String processing}
 \label{string}
 
