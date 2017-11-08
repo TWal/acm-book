@@ -8,7 +8,6 @@ vi lis(const vi& v) {
         b[p[i] - 1] = v[i];
         c = max(c, p[i]);
     }
-    // Return c here if we just need the length 
     vi ans(c);
     FORD(i, 0, n) if (p[i] == c) ans[--c] = i;
     return ans;
