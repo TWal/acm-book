@@ -4,8 +4,8 @@ struct GenSegTree : public Treap<Ord, GenSegTree<Ord, T>> {
     using M::l; using M::r; using M::s; using M::size;
     T value, sum, delta;
     Ord mini, maxi;
-    GenSegTree(Ord s_) : M(s_), mini(s_), maxi(s_) {}
-    GenSegTree(Ord s_, T v) : M(s_), value(v), sum(v), mini(s_), maxi(s_) {}
+    GenSegTree(Ord s_) : M(s_), value(), sum(), delta(), mini(s_), maxi(s_) {}
+    GenSegTree(Ord s_, T v) : M(s_), value(v), sum(v), delta(), mini(s_), maxi(s_) {}
 
     virtual void update() {
         M::update();

@@ -481,36 +481,12 @@ struct DummyGenSegTree {
     }
 };
 
-struct IntMonoid {
-    lli v;
-    IntMonoid() : v(0) {}
-    IntMonoid(lli v_) : v(v_) {}
-    IntMonoid operator+(IntMonoid rhs) const {
-        return v + rhs.v;
-    }
-    bool operator==(IntMonoid rhs) const {
-        return v == rhs.v;
-    }
-    IntMonoid operator*(lli rhs) const {
-        return v*rhs;
-    }
-    bool operator<(IntMonoid rhs) const {
-        return v < rhs.v;
-    }
-};
-
-ostream& operator<<(ostream& os, const IntMonoid& a) {
-    os << a.v;
-    return os;
-}
-
-
-using GST = GenSegTree<double, IntMonoid>;
-using DGST = DummyGenSegTree<double, IntMonoid>;
+using GST = GenSegTree<double, lli>;
+using DGST = DummyGenSegTree<double, lli>;
 
 struct GenSegTreeInsert : rc::state::Command<DGST, GST*> {
     double s;
-    IntMonoid val;
+    lli val;
     GenSegTreeInsert(const DGST&) : s(*rc::gen::arbitrary<double>()), val(*rc::gen::arbitrary<lli>()) {}
     void apply(DGST& dseg) const override {
         dseg.insert(s, val);
@@ -526,7 +502,7 @@ struct GenSegTreeInsert : rc::state::Command<DGST, GST*> {
 struct GenSegTreeAdd : rc::state::Command<DGST, GST*> {
     double left;
     double right;
-    IntMonoid val;
+    lli val;
     GenSegTreeAdd(const DGST&) : left(*rc::gen::arbitrary<double>()), right(*rc::gen::arbitrary<double>()), val(*rc::gen::arbitrary<lli>()) {
         if(left > right) swap(left, right);
     }
