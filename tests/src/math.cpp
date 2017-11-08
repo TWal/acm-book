@@ -9,6 +9,12 @@
 #include <math/opmod.cpp>
 #include <math/pollard_rho.cpp>
 #include <math/miller_rabin.cpp>
+#include <math/invmod.cpp>
+#include <math/invmod_range.cpp>
+#include <math/factorize_range.cpp>
+#include <math/gen_primes.cpp>
+#include <math/polynom_euclid.cpp>
+#include <math/linear_reccurence.cpp>
 #include <rapidcheck.h>
 
 const lli PR = 5;
@@ -23,13 +29,22 @@ static rc::Gen<vector<T>> getVector(int size) {
     return rc::gen::container<vector<T>>(size, rc::gen::arbitrary<T>());
 }
 
+template<typename T>
+static rc::Gen<T> getPrime() {
+    return rc::gen::map(rc::gen::arbitrary<T>(), [](T n) {
+        if(n < 0) n = -n;
+        while(!isPrime(n)) ++n;
+        return n;
+    });
+}
 
 template<>
 bool isZero<Fp<PR>>(Fp<PR> x) {
     return x.n == 0;
 }
 
-ostream& operator<<(ostream& os, Fp<PR> f) {
+template<lli P>
+ostream& operator<<(ostream& os, Fp<P> f) {
     os << f.n;
     return os;
 }
@@ -37,11 +52,11 @@ ostream& operator<<(ostream& os, Fp<PR> f) {
 
 namespace rc {
 
-template<>
-struct Arbitrary<Fp<PR>> {
-    static Gen<Fp<PR>> arbitrary() {
-        return gen::build<Fp<PR>>(
-            gen::set(&Fp<PR>::n, rc::gen::inRange<lli>(0, PR))
+template<lli P>
+struct Arbitrary<Fp<P>> {
+    static Gen<Fp<P>> arbitrary() {
+        return gen::build<Fp<P>>(
+            gen::set(&Fp<P>::n, rc::gen::inRange<lli>(0, P))
         );
     }
 };
@@ -416,5 +431,121 @@ void testMath() {
             }
         }
         RC_ASSERT(dumbIsPrime == isPrime(n));
+    });
+
+    rc::check("invmod", []() {
+        lli a = *rc::gen::arbitrary<int>().as("a");
+        lli m = *rc::gen::arbitrary<int>().as("m");
+        RC_PRE(a > 0);
+        RC_PRE(m > 0);
+        lli g = __gcd(a, m);
+        a /= g;
+        m /= g;
+        RC_PRE(m > 1);
+        lli b = invmod(a, m);
+        RC_ASSERT(((a*b)%m+m)%m == 1);
+    });
+
+    rc::check("invmodRange", []() {
+        lli p = *getPrime<int>().as("p");
+        lli size = min(10*1000ll, p-1);
+        vi invs = invmodRange(size, p);
+        FOR(i, size) {
+            if(i != 0) {
+                RC_ASSERT((i*invs[i])%p == 1);
+            }
+        }
+    });
+
+    rc::check("factorizeRange", []() {
+        lli l = *rc::gen::arbitrary<int>().as("l");
+        RC_PRE(l >= 2);
+        lli r = l + 1000;
+        vvi facts = factorizeRange(l, r);
+        RC_ASSERT(facts.size() == r-l);
+        FOR(i, facts.size()) {
+            lli cur = 1;
+            for(lli p : facts[i]) {
+                RC_ASSERT(isPrime(p));
+                cur *= p;
+            }
+            RC_ASSERT(cur == l+i);
+        }
+    });
+
+    rc::check("gen_primes", []() {
+        lli n = *rc::gen::inRange<int>(3, 10*1000).as("l");
+        vi p = genPrimes(n);
+        RC_ASSERT(p[0] == 2);
+        FOR(i, p.size()) {
+            RC_ASSERT(isPrime(p[i]));
+        }
+        FOR(i, p.size()-1) {
+            FORU(j, p[i]+1, p[i+1]) {
+                RC_ASSERT(!isPrime(j));
+            }
+        }
+    });
+
+    rc::check("polynom_euclid", []() {
+        const int size = *rc::gen::withSize([](int n) { return rc::gen::just(n); });
+        const lli P = 1000*1000*1000+7;
+        using F = Fp<P>;
+        vector<F> a = *getVector<F>(size).as("a");
+        lli bsize = *rc::gen::inRange<lli>(1, size+1);
+        vector<F> b = *getVector<F>(bsize).as("b");
+        RC_PRE(b.back().n != 0);
+        pair<vector<F>, vector<F>> eucl = euclid(a, b);
+        vector<F> q = eucl.first, r = eucl.second;
+        RC_ASSERT((q.size()-1) + (b.size()-1) == (a.size()-1));
+        RC_ASSERT(r.size() < b.size());
+        vector<F> bq(b.size()+q.size()-1, 0);
+        FOR(i, b.size()) FOR(j, q.size()) {
+            bq[i+j] = bq[i+j] + b[i]*q[j];
+        }
+        vector<F> sub(a.size());
+        FOR(i, a.size()) {
+            sub[i] = a[i]-bq[i];
+        }
+
+        FOR(i, sub.size()) {
+            if(i < r.size()) {
+                RC_ASSERT(sub[i].n == r[i].n);
+            } else {
+                RC_ASSERT(sub[i].n == 0);
+            }
+        }
+    });
+
+    rc::check("linear_reccurence", []() {
+        const int size = *rc::gen::withSize([](int n) { return rc::gen::just(n); });
+        RC_PRE(size >= 2);
+        const lli P = 1000*1000*1000+7;
+        using F = Fp<P>;
+        vector<F> rec = *getVector<F>(size).as("rec");
+        vector<F> vals = *getVector<F>(size).as("vals");
+        lli n = *rc::gen::inRange<lli>(0, 10*1000).as("n");
+        vector<F> polyRec(rec.size()+1);
+        FOR(i, rec.size()) {
+            polyRec[i] = F()-rec[i];
+        }
+        polyRec.back() = 1;
+        F fastVal = linearRec(n, polyRec, vals);
+
+        while(n >= vals.size()) {
+            F next = F();
+            FOR(i, vals.size()) {
+                next = next+vals[i]*rec[i];
+            }
+            FOR(i, vals.size()-1) {
+                vals[i] = vals[i+1];
+            }
+            vals.back() = next;
+            n -= 1;
+        }
+
+        F slowVal = vals[n];
+
+        RC_ASSERT(fastVal.n == slowVal.n);
     });
 }

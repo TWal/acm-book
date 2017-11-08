@@ -75,6 +75,12 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \algorithm{Extended GCD - $O(\log(\min(a, b)))$}
 \lstinputlisting{src/math/egcd.cpp}
 
+\algorithm{Inverse of $a$ modulo $m$ when $\operatorname{gcd}(a, m) = 1$ - $O(\log(\min(a, m)))$}
+\lstinputlisting{src/math/invmod.cpp}
+
+\algorithm{Inverses modulo $p$ of $\{1, \dots, N\}$ - $O(N)$}
+\lstinputlisting{src/math/invmod_range.cpp}
+
 \algorithm{Field $\mathbb F_p$ or group $\mathbb Z/n\mathbb Z$}
 \lstinputlisting{src/math/Fp.cpp}
 
@@ -104,6 +110,18 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 
 \algorithm{Miller-rabin (primality test) - $O(\log(n))$}
 \lstinputlisting{src/math/miller_rabin.cpp}
+
+\algorithm{Generate primes $< N$ - $O(N \log N)$}
+\lstinputlisting{src/math/gen_primes.cpp}
+
+\algorithm{Factorize numbers in $\{L, \dots, R\}$ - $O(\sqrt{R} + (R-L) \log(R))$}
+\lstinputlisting{src/math/factorize_range.cpp}
+
+\algorithm{Polynomial euclidian division - $O(|Q|(|P|-|Q|))$}
+\lstinputlisting{src/math/polynom_euclid.cpp}
+
+\algorithm{$n$th term of linear reccurence of order $k$ - $O(k^2 \log(n))$}
+\lstinputlisting{src/math/linear_reccurence.cpp}
 
 \algosection{String processing}
 \label{string}
@@ -144,8 +162,8 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \algorithm{Treap - Augmentable binary search tree - $O(\log(n))$ insert / split / merge}
 \lstinputlisting{src/datastruct/treap.cpp}
 
-\algorithm{Generic segment tree - Example of treap augmentation - $O(\log(n))$ insert / query / add}
-\lstinputlisting{src/datastruct/treap_gensegtree.cpp}
+%\algorithm{Generic segment tree - Example of treap augmentation - $O(\log(n))$ insert / query / add}
+%\lstinputlisting{src/datastruct/treap_gensegtree.cpp}
 
 \algorithm{RMQ - $O(n \log n)$ initialization - $O(1)$ query}
 \lstinputlisting{src/datastruct/rmq.cpp}

@@ -10,6 +10,12 @@ math/subset_sum.cpp: some programming bootcamp
 math/opmod.cpp: my implementation
 math/pollard_rho.cpp: wikipedia
 math/miller_rabin.cpp: wikipedia
+math/factorize_range.cpp: own implementation
+math/gen_primes.cpp: https://github.com/stjepang/snippets/blob/master/prime.cpp
+math/invmod.cpp: a lecture from enot110
+math/invmod_range.cpp: a lecture from enot110
+math/linear_reccurence.cpp: own implementation
+math/polynom_euclid.cpp: own implementation
 string/kmp.cpp: http://www.iti.fh-flensburg.de/lang/algorithmen/pattern/kmpen.htm
 string/zfunc.cpp: https://github.com/stjepang/snippets/blob/master/z_algorithm.cpp
 string/ahocorasick.cpp: original paper (http://cr.yp.to/bib/1975/aho.pdf)
