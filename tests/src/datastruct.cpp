@@ -10,7 +10,6 @@
 #include <rapidcheck.h>
 #include <rapidcheck/state.h>
 
-
 /*   _   _       _                    __ _           _
     | | | |_ __ (_) ___  _ __        / _(_)_ __   __| |
     | | | | '_ \| |/ _ \| '_ \ _____| |_| | '_ \ / _` |
@@ -547,7 +546,6 @@ static void testTreap() {
     });
 }
 
-
 /*  ____  __  __  ___
    |  _ \|  \/  |/ _ \
    | |_) | |\/| | | | |
@@ -564,7 +562,7 @@ static void testRMQ() {
 
         FOR(l, v.size()) {
             FORU(r, l+1, v.size()+1) {
-                lli rmqMin = rmq.query(l, r);
+                lli rmqMin = v[rmq.query(l, r)];
                 lli calcMin = v[l];
                 FORU(i, l, r) {
                     calcMin = min(calcMin, v[i]);

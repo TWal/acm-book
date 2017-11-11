@@ -21,6 +21,6 @@ struct LCA {
     lli query(lli a, lli b) {
         lli fa = first[a], fb = first[b];
         if(fa > fb) swap(fa, fb);
-        return Y(rmq.query(fa, fb+1));
+        return Y(euler[rmq.query(fa, fb+1)]);
     }
 };
