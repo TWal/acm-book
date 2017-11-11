@@ -4,6 +4,7 @@
 #include <graph/scc_kosaraju.cpp>
 #include <graph/articulation.cpp>
 #include <graph/bridges.cpp>
+#include <graph/dominator_tree.cpp>
 #include <rapidcheck.h>
 
 static rc::Gen<vvi> getGraph() {
@@ -115,6 +116,79 @@ struct CompConnEdge {
     }
 };
 
+struct NodeDominators {
+    vvi adj;
+    lli N;
+    vb seen1, seen2;
+    vi doms;
+    NodeDominators(const vvi& adj, lli source, lli node) : adj(adj), N(adj.size()), seen1(N, false), seen2(seen1) {
+        dfs(source, -1, seen1);
+        dfs(source, node, seen2);
+        FOR(i, N) {
+            if(seen1[i] && !seen2[i]) {
+                doms.pb(i);
+            }
+        }
+    }
+    void dfs(lli n, lli forbidden, vb& seen) {
+        if(n == forbidden) return;
+        if(seen[n]) return;
+        seen[n] = true;
+        for(lli neigh : adj[n]) {
+            dfs(neigh, forbidden, seen);
+        }
+    }
+};
+
+struct DumbDomTree {
+    lli N;
+    vvi doms, invdom;
+    vi dompar;
+    DumbDomTree(const vvi& adj, lli source) : N(adj.size()), doms(N), invdom(N), dompar(N) {
+        FOR(i, N) {
+            NodeDominators nd(adj, source, i);
+            invdom[i] = nd.doms;
+        }
+        FOR(i, N) {
+            for(lli j : invdom[i]) {
+                doms[j].pb(i);
+            }
+        }
+        FOR(i, N) {
+            if(i == source) {
+                dompar[i] = source;
+                continue;
+            }
+            dompar[i] = -1;
+            for(lli d : doms[i]) if(d != i) {
+                if(dompar[i] == -1 || inside(dompar[i], doms[d])) {
+                    dompar[i] = d;
+                }
+            }
+        }
+    }
+    bool inside(lli x, const vi& v) {
+        FOR(i, v.size()) {
+            if(v[i] == x) return true;
+        }
+        return false;
+    }
+};
+
+struct TreeParents {
+    vvi adj;
+    vi par;
+    TreeParents(const vvi& adj, lli root) : adj(adj), par(adj.size(), -1) {
+        dfs(root, root);
+    }
+    void dfs(lli node, lli parent) {
+        if(par[node] >= 0) return;
+        par[node] = parent;
+        for(lli neigh : adj[node]) {
+            dfs(neigh, node);
+        }
+    }
+};
 
 void testGraph() {
     rc::check("scc_tarjan", []() {
@@ -173,6 +247,18 @@ void testGraph() {
                 RC_ASSERT((nbcc.ncc < newNbcc.ncc) == isBridge);
             }
         }
+    });
+
+    rc::check("dominator_tree", []() {
+        vvi g = *getGraph().as("graph");
+        lli n = g.size();
+        lli source = *rc::gen::inRange<lli>(0, n);
+        DominatorTree dt(g, source);
+
+        TreeParents tp(dt.dom, source);
+        DumbDomTree ddt(g, source);
+
+        RC_ASSERT(tp.par == ddt.dompar);
     });
 }
 
