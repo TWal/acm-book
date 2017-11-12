@@ -1,17 +1,18 @@
 syntax on
 filetype plugin on
 set cc=80 "colorcolumn
+colo darkblue
 set bg=dark "background
 set nu "number
-set ts=4 "tabstop
-set sw=4 "shiftwidth
 set et "expandtab
+set ts=4 "tabstop
+set sts=4 "softtabstop
+set sw=4 "shiftwidth
 set si "smartindent
 set hls "hlsearch
 set is "incsearch
 set ttm=100 " Don't wait when doing <Esc>O, ttimeoutlen
 set so=5 " 5 line above / below the cursor when scrolling, scrolloff
-set cul "cursorline
 xnoremap < <gv
 xnoremap > >gv
 noremap 0 ^
