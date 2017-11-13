@@ -9,6 +9,7 @@ char normalize(char c) { //normalize `c` in [0, ..., MAX_TRA-1]
 }
 #include <string/suffixautomaton.cpp>
 #include <string/suffixarray.cpp>
+#include <string/suffixarray_linear.cpp>
 
 #include <datastruct/unionfind.cpp>
 #include <rapidcheck.h>
@@ -296,7 +297,7 @@ void testString() {
                 }
             }
         }
-        sa.aut.pb(array<lli, MAX_TRA>());
+        sa.aut.pb(array<int, MAX_TRA>());
         FOR(j, MAX_TRA) {
             sa.aut[N][j] = N;
         }
@@ -381,5 +382,14 @@ void testString() {
         }
     });
 
+    rc::check("suffixarray_linear: same as suffixarray", []() {
+        string s = *getString().as("str");
+        RC_PRE(s.size() >= 1);
+        SuffixArray sa(s);
+        SuffixArrayLinear sa_lin(s);
+        RC_ASSERT(sa.sa == sa_lin.sa);
+        RC_ASSERT(sa.pos == sa_lin.pos);
+        RC_ASSERT(sa.lcp == sa_lin.lcp);
+    });
 }
 

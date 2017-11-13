@@ -135,11 +135,14 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \algorithm{Aho-Corasick - linear}
 \lstinputlisting{src/string/ahocorasick.cpp}
 
-\algorithm{Suffix automaton - $O(n)$}
+\algorithm{Suffix automaton - $O(n \Sigma)$}
 \lstinputlisting{src/string/suffixautomaton.cpp}
 
 \algorithm{Suffix array \& LCP - $O(n \log(n)^2)$}
 \lstinputlisting{src/string/suffixarray.cpp}
+
+\algorithm{Suffix array \& LCP using Suffix Automaton - $O(n \Sigma)$}
+\lstinputlisting{src/string/suffixarray_linear.cpp}
 
 \algosection{Data structures}
 \label{datastruct}

@@ -4,24 +4,25 @@
 // }
 
 struct SuffixAutomaton {
-    vector<array<lli, MAX_TRA>> aut;
-    vi len, link;
+    array<int, MAX_TRA> defNode;
+    vector<array<int, MAX_TRA>> aut;
+    vector<int> len, link;
     vb isFinal;
-    lli last;
+    int last;
 
-    lli insert(int le, int li, int cp = -1) {
+    int insert(int le, int li, int cp = -1) {
         len.pb(le);
         link.pb(li);
-        aut.emplace_back();
-        FOR(i, MAX_TRA) aut.back()[i] = cp < 0 ? -1 : aut[cp][i];
+        aut.pb(cp == -1 ? defNode : aut[cp]);
         return aut.size()-1;
     }
 
     SuffixAutomaton() {
+        FOR(i, MAX_TRA) defNode[i] = -1;
         last = insert(0, -1);
     }
 
-    void reserve(lli n) {
+    void reserve(int n) {
         aut.reserve(2*n);
         link.reserve(2*n);
         len.reserve(2*n);
@@ -29,16 +30,16 @@ struct SuffixAutomaton {
 
     void add(char c) {
         c = normalize(c);
-        lli p, cur = insert(len[last]+1, -2);
+        int p, cur = insert(len[last]+1, -2);
         for(p = last; p != -1 && aut[p][c] == -1; p = link[p]) {
             aut[p][c] = cur;
         }
         if(p != -1) {
-            lli q = aut[p][c];
+            int q = aut[p][c];
             if(len[q] == len[p]+1) {
                 link[cur] = q;
             } else {
-                lli qq = insert(len[p]+1, link[q], q);
+                int qq = insert(len[p]+1, link[q], q);
                 link[q] = link[cur] = qq;
                 for(; p != -1 && aut[p][c] == q; p = link[p]) {
                     aut[p][c] = qq;
@@ -52,6 +53,6 @@ struct SuffixAutomaton {
 
     void computeFinals() {
         isFinal.assign(aut.size(), false);
-        for(lli cur = last; cur >= 0; cur = link[cur]) isFinal[cur] = true;
+        for(int cur = last; cur >= 0; cur = link[cur]) isFinal[cur] = true;
     }
 };
