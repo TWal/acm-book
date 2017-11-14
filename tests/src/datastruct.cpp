@@ -7,8 +7,10 @@
 #include <datastruct/treap.cpp>
 #include <datastruct/treap_gensegtree.cpp>
 #include <datastruct/rmq.cpp>
+#include <datastruct/wavelettree.cpp>
 #include <rapidcheck.h>
 #include <rapidcheck/state.h>
+
 
 /*   _   _       _                    __ _           _
     | | | |_ __ (_) ___  _ __        / _(_)_ __   __| |
@@ -573,11 +575,169 @@ static void testRMQ() {
     });
 }
 
+
+// __        __              _      _  _____
+// \ \      / /_ ___   _____| | ___| ||_   _| __ ___  ___
+//  \ \ /\ / / _` \ \ / / _ \ |/ _ \ __|| || '__/ _ \/ _ \
+//   \ V  V / (_| |\ V /  __/ |  __/ |_ | || | |  __/  __/
+//    \_/\_/ \__,_| \_/ \___|_|\___|\__||_||_|  \___|\___|
+
+struct DummyWaveletTree {
+    int n;
+    vi a;
+    vb activated;
+    DummyWaveletTree(int n, const vi& a) : n(n), a(a), activated(a.size(), true) {}
+
+    void wswap(int x) {
+        swap(a[x], a[x+1]);
+    }
+
+    void activate(int x, bool activation) {
+        activated[x] = activation;
+    }
+
+    int rank(lli v, int l, int r) const {
+        int res = 0;
+        FORU(i, l, r) {
+            res += (activated[i] && a[i] == v);
+        }
+        return res;
+    }
+
+    int rankrange(lli x, lli y, int l, int r) const {
+        int res = 0;
+        FORU(i, l, r) {
+            res += (activated[i] && x <= a[i] && a[i] < y);
+        }
+        return res;
+    }
+
+
+    int kth(int k, int l, int r) const {
+        vi range;
+        FORU(i, l, r) if(activated[i]) {
+            range.pb(a[i]);
+        }
+        if(k > range.size()) return -1;
+        sort(range.begin(), range.end());
+        return range[k-1];
+    }
+};
+
+struct WaveletTreeRank : rc::state::Command<DummyWaveletTree, WaveletTree> {
+    bool totalRandom;
+    lli l, r, x;
+    WaveletTreeRank(const DummyWaveletTree& dwt) :
+        totalRandom(*rc::gen::arbitrary<bool>()),
+        l(*rc::gen::inRange<lli>(0, dwt.a.size())),
+        r(*rc::gen::inRange<lli>(l, dwt.a.size())),
+        x(*rc::gen::inRange<lli>(0, dwt.n))
+        {}
+
+    void apply(DummyWaveletTree&) const override {
+    }
+    void run(const DummyWaveletTree& dwt, WaveletTree& wt) const override {
+        RC_ASSERT(dwt.rank(x, l, r) == wt.rank(x, l, r));
+    }
+    void show(std::ostream& os) const override {
+        os << "Rank(" << x << ", " << l << ", " << r << ")";
+    }
+};
+
+struct WaveletTreeRankRange : rc::state::Command<DummyWaveletTree, WaveletTree> {
+    bool totalRandom;
+    lli l, r, x, y;
+    WaveletTreeRankRange(const DummyWaveletTree& dwt) :
+        totalRandom(*rc::gen::arbitrary<bool>()),
+        l(*rc::gen::inRange<lli>(0, dwt.a.size())),
+        r(*rc::gen::inRange<lli>(l, dwt.a.size())),
+        x(*rc::gen::inRange<lli>(0, dwt.n)),
+        y(*rc::gen::inRange<lli>(x, dwt.n))
+        {}
+
+    void apply(DummyWaveletTree&) const override {
+    }
+    void run(const DummyWaveletTree& dwt, WaveletTree& wt) const override {
+        RC_ASSERT(dwt.rankrange(x, y, l, r) == wt.rankrange(x, y, l, r));
+    }
+    void show(std::ostream& os) const override {
+        os << "RankRange(" << x << ", " << y << ", " << l << ", " << r << ")";
+    }
+};
+
+
+struct WaveletTreeKth : rc::state::Command<DummyWaveletTree, WaveletTree> {
+    lli l, r, k;
+    WaveletTreeKth(const DummyWaveletTree& dwt) :
+        l(*rc::gen::inRange<lli>(0, dwt.a.size())),
+        r(*rc::gen::inRange<lli>(l, dwt.a.size())),
+        k(*rc::gen::inRange<lli>(1, r-l))
+        {}
+
+    void apply(DummyWaveletTree&) const override {
+    }
+    void run(const DummyWaveletTree& dwt, WaveletTree& wt) const override {
+        RC_ASSERT(dwt.kth(k, l, r) == wt.kth(k, l, r));
+    }
+    void show(std::ostream& os) const override {
+        os << "Kth(" << k << ", " << l << ", " << r << ")";
+    }
+};
+
+struct WaveletTreeSwap : rc::state::Command<DummyWaveletTree, WaveletTree> {
+    lli x;
+    WaveletTreeSwap(const DummyWaveletTree& dwt) :
+        x(*rc::gen::inRange<lli>(0, dwt.a.size()-1))
+        {}
+
+    void apply(DummyWaveletTree& dwt) const override {
+        dwt.wswap(x);
+    }
+    void run(const DummyWaveletTree&, WaveletTree& wt) const override {
+        wt.wswap(x);
+    }
+    void show(std::ostream& os) const override {
+        os << "Swap(" << x << ")";
+    }
+};
+
+struct WaveletTreeActivate : rc::state::Command<DummyWaveletTree, WaveletTree> {
+    bool act;
+    lli x;
+    WaveletTreeActivate(const DummyWaveletTree& dwt) :
+        act(*rc::gen::arbitrary<bool>()),
+        x(*rc::gen::inRange<lli>(0, dwt.a.size()))
+        {}
+
+    void apply(DummyWaveletTree& dwt) const override {
+        dwt.activate(x, act);
+    }
+    void run(const DummyWaveletTree&, WaveletTree& wt) const override {
+        wt.activate(x, act);
+    }
+    void show(std::ostream& os) const override {
+        os << "Activate(" << x << ", " << act << ")";
+    }
+};
+
+static void testWaveletTree() {
+    rc::check("wavelettree", []() {
+        lli n = *rc::gen::inRange<lli>(1, 100*1000).as("n");
+        vi v = *rc::gen::container<vi>(rc::gen::inRange<lli>(0, n)).as("v");
+
+        WaveletTree wt(n, v);
+        DummyWaveletTree dwt(n, v);
+
+        rc::state::check(dwt, wt, rc::state::gen::execOneOfWithArgs<WaveletTreeKth, WaveletTreeRank, WaveletTreeSwap, WaveletTreeActivate, WaveletTreeRankRange>());
+    });
+}
+
 void testDatastruct() {
     testUF();
     testFenwick();
     testSegTree();
     testTreap();
     testRMQ();
+    testWaveletTree();
 }
 
