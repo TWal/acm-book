@@ -25,7 +25,7 @@ struct WaveletTree {
         build(v.begin(), v.end(), 0, n-1, 1);
     }
 
-    pii _rank(int v, int r) const {
+    pii _rank(int v, int r, bool calcSum = true) const {
         int L = 0, R = n - 1, u = 1, sum = 0;
         while(L != R) {
             int M = (L + R) / 2;
@@ -34,7 +34,7 @@ struct WaveletTree {
                 R = M;
                 u = 2 * u;
             } else {
-                sum += active[2*u].get(t[u][r]);
+                if(calcSum) sum += active[2*u].get(t[u][r]);
                 r -= t[u][r];
                 L = M + 1;
                 u = 2 * u + 1;
@@ -48,7 +48,7 @@ struct WaveletTree {
         int xsave = x;
         bool nact[2];
         FOR(i, 2) nact[i] = !isActivated(x+i);
-        FOR(i, 2) if(nact[i]) activate(x+i, true);
+        FOR(i, 2) if(nact[i]) activate(x+i, true, false);
         int L = 0, R = n - 1, u = 1;
         int v1 = a[x], v2 = a[x + 1];
         swap(a[x], a[x + 1]);
@@ -67,12 +67,12 @@ struct WaveletTree {
                 u = 2 * u + 1;
             }
         }
-        FOR(i, 2) if(nact[i]) activate(xsave+i, false);
+        FOR(i, 2) if(nact[i]) activate(xsave+i, false, false);
     }
 
     // Toggle the state of the element of value v at index x
-    void activate(int x, bool activation) {
-        if(active[1].get(x+1)-active[1].get(x) == activation) return;
+    void activate(int x, bool activation, bool check = true) {
+        if(check && isActivated(x) == activation) return;
         int L = 0, R = n - 1, u = 1;
         int v = a[x];
         while(L != R) {
@@ -94,10 +94,12 @@ struct WaveletTree {
     bool isActivated(int x) { return active[1].get(x+1) == 1+active[1].get(x); }
 
     // Card{l <= k < r | a[k] == v}
-    int rank(int v, int l, int r) const { return Y(_rank(v, r)) - Y(_rank(v, l)); }
+    int rank(int v, int l, int r) const {
+        return Y(_rank(v, r, false)) - Y(_rank(v, l, false));
+    }
 
     // Card{l <= k < r | x <= a[k] < y}
-    int rankrange(int x, int y, int l, int r) {
+    int rankrange(int x, int y, int l, int r) const {
         return X(_rank(y, r)) - X(_rank(x, r)) - X(_rank(y, l)) + X(_rank(x, l));
     }
 
