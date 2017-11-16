@@ -8,6 +8,7 @@
 #include <datastruct/treap_gensegtree.cpp>
 #include <datastruct/rmq.cpp>
 #include <datastruct/wavelettree.cpp>
+#include <datastruct/logvector.cpp>
 #include <rapidcheck.h>
 #include <rapidcheck/state.h>
 
@@ -536,7 +537,6 @@ static void testTreap() {
     rc::check("treap", []() {
         lli meh = 0;
         MyTreap* treap = new MyTreap(0);
-
         rc::state::check(meh, treap, rc::state::gen::execOneOfWithArgs<TreapInsert, TreapCheckHeap, TreapCheckBst, TreapCheckSize>());
     });
 
@@ -732,6 +732,193 @@ static void testWaveletTree() {
     });
 }
 
+template<typename T>
+struct DummyLogVector {
+    vector<T> vec;
+    DummyLogVector() {}
+    T& operator[](lli k) {
+        return vec[k];
+    }
+    const T& operator[](lli k) const {
+        return vec[k];
+    }
+    lli size() const {
+        return vec.size();
+    }
+    void insert(lli k, const T& v) {
+        vec.insert(vec.begin() + k, v);
+    }
+    void erase(lli l, lli r) {
+        vec.erase(vec.begin()+l, vec.begin()+r);
+    }
+    void reverse(lli l, lli r) {
+        ::reverse(vec.begin()+l, vec.begin()+r);
+    }
+    void add(lli l, lli r, const T& v) {
+        FORU(i, l, r) vec[i] = vec[i] + v;
+    }
+    T sum(lli l, lli r) const {
+        T sum = T();
+        FORU(i, l, r) sum = sum + vec[i];
+        return sum;
+    }
+};
+
+template<typename T>
+struct LogVectorInsert : rc::state::Command<DummyLogVector<T>, LogVector<T>> {
+    lli k;
+    T val;
+    LogVectorInsert(const DummyLogVector<T>& dlv) :
+        k(*rc::gen::inRange<lli>(0, dlv.vec.size()+1)),
+        val(*rc::gen::arbitrary<T>())
+        {}
+
+    void checkPreconditions(const DummyLogVector<T>& dlv) const override {
+        RC_PRE(k <= dlv.size());
+    }
+    void apply(DummyLogVector<T>& dlv) const override {
+        dlv.insert(k, val);
+    }
+    void run(const DummyLogVector<T>&, LogVector<T>& lv) const override {
+        lv.insert(k, val);
+    }
+    void show(std::ostream& os) const override {
+        os << "Insert(" << k << ", " << val << ")";
+    }
+};
+
+template<typename T>
+struct LogVectorGet : rc::state::Command<DummyLogVector<T>, LogVector<T>> {
+    lli k;
+    LogVectorGet(const DummyLogVector<T>& dlv) :
+        k(*rc::gen::inRange<lli>(0, dlv.vec.size()))
+        {}
+
+    void checkPreconditions(const DummyLogVector<T>& dlv) const override {
+        RC_PRE(k < dlv.size());
+    }
+    void apply(DummyLogVector<T>&) const override {
+    }
+    void run(const DummyLogVector<T>& dlv, LogVector<T>& lv) const override {
+        RC_ASSERT(lv[k] == dlv[k]);
+    }
+    void show(std::ostream& os) const override {
+        os << "Get(" << k << ")";
+    }
+};
+
+template<typename T>
+struct LogVectorSize : rc::state::Command<DummyLogVector<T>, LogVector<T>> {
+    LogVectorSize(const DummyLogVector<T>&) {}
+
+    void apply(DummyLogVector<T>&) const override {
+    }
+    void run(const DummyLogVector<T>& dlv, LogVector<T>& lv) const override {
+        RC_ASSERT(lv.size() == dlv.size());
+    }
+    void show(std::ostream& os) const override {
+        os << "Size()";
+    }
+};
+
+template<typename T>
+struct LogVectorErase : rc::state::Command<DummyLogVector<T>, LogVector<T>> {
+    lli l, r;
+    LogVectorErase(const DummyLogVector<T>& dlv) :
+        l(*rc::gen::inRange<lli>(0, dlv.size()+1)),
+        r(*rc::gen::inRange<lli>(l, dlv.size()+1))
+        {}
+
+    void checkPreconditions(const DummyLogVector<T>& dlv) const override {
+        RC_PRE(r <= dlv.size());
+    }
+    void apply(DummyLogVector<T>& dlv) const override {
+        dlv.erase(l, r);
+    }
+    void run(const DummyLogVector<T>&, LogVector<T>& lv) const override {
+        lv.erase(l, r);
+    }
+    void show(std::ostream& os) const override {
+        os << "Erase(" << l << ", " << r << ")";
+    }
+};
+
+template<typename T>
+struct LogVectorReverse : rc::state::Command<DummyLogVector<T>, LogVector<T>> {
+    lli l, r;
+    LogVectorReverse(const DummyLogVector<T>& dlv) :
+        l(*rc::gen::inRange<lli>(0, dlv.size()+1)),
+        r(*rc::gen::inRange<lli>(l, dlv.size()+1))
+        {}
+
+    void checkPreconditions(const DummyLogVector<T>& dlv) const override {
+        RC_PRE(r <= dlv.size());
+    }
+    void apply(DummyLogVector<T>& dlv) const override {
+        dlv.reverse(l, r);
+    }
+    void run(const DummyLogVector<T>&, LogVector<T>& lv) const override {
+        lv.reverse(l, r);
+    }
+    void show(std::ostream& os) const override {
+        os << "Reverse(" << l << ", " << r << ")";
+    }
+};
+
+template<typename T>
+struct LogVectorAdd : rc::state::Command<DummyLogVector<T>, LogVector<T>> {
+    lli l, r;
+    T v;
+    LogVectorAdd(const DummyLogVector<T>& dlv) :
+        l(*rc::gen::inRange<lli>(0, dlv.size()+1)),
+        r(*rc::gen::inRange<lli>(l, dlv.size()+1)),
+        v(*rc::gen::arbitrary<T>())
+        {}
+
+    void checkPreconditions(const DummyLogVector<T>& dlv) const override {
+        RC_PRE(r <= dlv.size());
+    }
+    void apply(DummyLogVector<T>& dlv) const override {
+        dlv.add(l, r, v);
+    }
+    void run(const DummyLogVector<T>&, LogVector<T>& lv) const override {
+        lv.add(l, r, v);
+    }
+    void show(std::ostream& os) const override {
+        os << "Add(" << l << ", " << r << ", " << v << ")";
+    }
+};
+
+template<typename T>
+struct LogVectorSum : rc::state::Command<DummyLogVector<T>, LogVector<T>> {
+    lli l, r;
+    LogVectorSum(const DummyLogVector<T>& dlv) :
+        l(*rc::gen::inRange<lli>(0, dlv.size()+1)),
+        r(*rc::gen::inRange<lli>(l, dlv.size()+1))
+        {}
+
+    void checkPreconditions(const DummyLogVector<T>& dlv) const override {
+        RC_PRE(r <= dlv.size());
+    }
+    void apply(DummyLogVector<T>&) const override {
+    }
+    void run(const DummyLogVector<T>& dlv, LogVector<T>& lv) const override {
+        RC_ASSERT(dlv.sum(l, r) == lv.sum(l, r));
+    }
+    void show(std::ostream& os) const override {
+        os << "Sum(" << l << ", " << r << ")";
+    }
+};
+
+static void testLogVector() {
+    rc::check("implicit_treap", []() {
+        LogVector<lli> lv;
+        DummyLogVector<lli> dlv;
+
+        rc::state::check(dlv, lv, rc::state::gen::execOneOfWithArgs<LogVectorInsert<lli>, LogVectorGet<lli>, LogVectorSize<lli>, LogVectorErase<lli>, LogVectorReverse<lli>, LogVectorAdd<lli>, LogVectorSum<lli>>());
+    });
+}
+
 void testDatastruct() {
     testUF();
     testFenwick();
@@ -739,5 +926,6 @@ void testDatastruct() {
     testTreap();
     testRMQ();
     testWaveletTree();
+    testLogVector();
 }
 

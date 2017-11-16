@@ -14,6 +14,7 @@ struct Treap {
     virtual void push() {}
 
     //internal method, precondition: minimum `s` in b >= maximum `s` in a
+    //invalidate a and b
     static Tr* merge(Tr* a, Tr* b) {
         if(!a || !b) return a ? a : b;
         a->push(); b->push();
@@ -28,6 +29,7 @@ struct Treap {
         }
     }
 
+    //invalidate this
     tuple<Tr*, Tr*> split(Ord k) {
         push();
         if(k <= s) {
@@ -43,6 +45,7 @@ struct Treap {
         }
     }
 
+    //invalidate this
     Tr* insert(Ord k) {
         auto p = split(k);
         return merge(X(p), merge(new Tr(k), Y(p)));
