@@ -2,6 +2,7 @@
 #include <string/kmp.cpp>
 #include <string/zfunc.cpp>
 #include <string/ahocorasick.cpp>
+#include <string/manacher.cpp>
 
 const int MAX_TRA = 26;
 char normalize(char c) { //normalize `c` in [0, ..., MAX_TRA-1]
@@ -390,6 +391,24 @@ void testString() {
         RC_ASSERT(sa.sa == sa_lin.sa);
         RC_ASSERT(sa.pos == sa_lin.pos);
         RC_ASSERT(sa.lcp == sa_lin.lcp);
+    });
+
+    rc::check("manacher", []() {
+        string s = *getString().as("s");
+        lli n = s.size();
+        RC_PRE(n >= 1);
+        lli m = 2*n+1;
+        vector<char> t(m, -1);
+        FOR(i, n) t[2*i+1] = s[i];
+        vi rad(m, 0);
+        FOR(i, m) {
+            lli& r = rad[i];
+            while(i-r-1 >= 0 && i+r+1 < m && t[i-r-1] == t[i+r+1]) ++r;
+        }
+        rad.pop_back();
+        rad.erase(rad.begin());
+        for(lli& r : rad) r /= 2;
+        RC_ASSERT(manacher(s) == rad);
     });
 }
 
