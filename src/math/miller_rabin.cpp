@@ -4,7 +4,7 @@ bool millerRabin(llu n, llu a) {
         llu x = powmod(a, r, n);
         if(x == n-1) return true;
         if(x != 1) return false;
-        if(r%2 == 0) return true;
+        if(r%2 != 0) return true;
         r /= 2;
     }
 }
