@@ -5,12 +5,13 @@
 #include <string/manacher.cpp>
 
 const int MAX_TRA = 26;
-char normalize(char c) { //normalize `c` in [0, ..., MAX_TRA-1]
+int normalize(char c) { //normalize `c` in [0, ..., MAX_TRA-1]
     return c - 'a';
 }
 #include <string/suffixautomaton.cpp>
 #include <string/suffixarray.cpp>
 #include <string/suffixarray_linear.cpp>
+#include <string/palindromic_tree.cpp>
 
 #include <datastruct/unionfind.cpp>
 #include <rapidcheck.h>
@@ -39,6 +40,46 @@ static string getSuffix(const string& s, lli size) {
 
 static bool isSuffix(const string& big, const string& small) {
     return small.size() <= big.size() && getSuffix(big, small.size()) == small;
+}
+
+static bool isPalindrome(const string& s) {
+    string t = s;
+    reverse(t.begin(), t.end());
+    return t == s;
+}
+
+static vector<string> allPalindromes(const string& s) {
+    lli n = s.size();
+    vector<string> res;
+    FOR(i, n) {
+        FORU(j, i+1, n+1) {
+            string t = s.substr(i, j-i);
+            if(isPalindrome(t)) {
+                res.pb(t);
+            }
+        }
+    }
+    return res;
+}
+
+static vector<string> getNodeRepresentation(const PalindromicTree& pt) {
+    vector<string> res(pt.t.size());
+
+    FOR(i, pt.t.size()) {
+        FOR(j, 26) {
+            char c = 'a'+j;
+            lli cur = pt.t[i].next[j];
+            if(cur != -1) {
+                if(i == 0) {
+                    res[cur] = c;
+                } else {
+                    res[cur] = c + res[i] + c;
+                }
+            }
+        }
+    }
+
+    return res;
 }
 
 void testString() {
@@ -410,5 +451,100 @@ void testString() {
         for(lli& r : rad) r /= 2;
         RC_ASSERT(manacher(s) == rad);
     });
-}
 
+    rc::check("palindromic_tree: check add", []() {
+        string s = *getString().as("s");
+
+        string curs;
+        PalindromicTree pt;
+        for(char c : s) {
+            vector<string> oldpals = allPalindromes(curs);
+            bool b = pt.add(c);
+            curs.pb(c);
+            vector<string> newpals = allPalindromes(curs);
+            set<string> soldpals(oldpals.begin(), oldpals.end());
+            set<string> snewpals(newpals.begin(), newpals.end());
+            RC_ASSERT(b == (soldpals != snewpals));
+        }
+    });
+
+    rc::check("palindromic_tree: check that pt contains palindromes of s and only them", []() {
+        string s = *getString().as("s");
+
+        vector<string> pals = allPalindromes(s);
+
+        PalindromicTree pt;
+        for(char c : s) pt.add(c);
+        vector<string> ptpals = getNodeRepresentation(pt);
+
+        //check that pt contains palindromes of s and only them
+        set<string> sptpals(ptpals.begin()+2, ptpals.end());
+        set<string> spals(pals.begin(), pals.end());
+        RC_ASSERT(sptpals == spals);
+    });
+
+    rc::check("palindromic_tree: check link", []() {
+        string s = *getString().as("s");
+
+        vector<string> pals = allPalindromes(s);
+
+        PalindromicTree pt;
+        for(char c : s) pt.add(c);
+        vector<string> ptpals = getNodeRepresentation(pt);
+
+        FOR(i, pt.t.size()) {
+            lli suf = pt.t[i].link;
+            if(suf == 0) {
+                RC_ASSERT(i == 0 || i == 1);
+                continue;
+            }
+            lli m = ptpals[i].size();
+            string cur;
+            FORU(j, 1, m) {
+                cur = ptpals[i].substr(j, string::npos);
+                if(isPalindrome(cur)) break;
+            }
+            RC_ASSERT(ptpals[suf] == cur);
+        }
+    });
+
+    rc::check("palindromic_tree: check sufCount", []() {
+        string s = *getString().as("s");
+
+        vector<string> pals = allPalindromes(s);
+
+        PalindromicTree pt;
+        for(char c : s) pt.add(c);
+        vector<string> ptpals = getNodeRepresentation(pt);
+
+        FOR(i, pt.t.size()) {
+            if(i == 0) continue;
+            lli count = 0;
+            FOR(j, ptpals[i].size()) {
+                if(isPalindrome(ptpals[i].substr(j, string::npos))) ++count;
+            }
+            RC_ASSERT(pt.t[i].sufCount == count);
+        }
+    });
+
+    rc::check("palindromic_tree: check occ", []() {
+        string s = *getString().as("s");
+
+        vector<string> pals = allPalindromes(s);
+
+        PalindromicTree pt;
+        for(char c : s) pt.add(c);
+        vector<string> ptpals = getNodeRepresentation(pt);
+
+        multiset<string> spals(pals.begin(), pals.end());
+        vi occ = pt.computeOcc();
+        multiset<string> sptpals;
+        FOR(i, pt.t.size()) {
+            if(i <= 1) continue;
+            FOR(j, occ[i]) {
+                sptpals.insert(ptpals[i]);
+            }
+        }
+        RC_ASSERT(sptpals == spals);
+    });
+}

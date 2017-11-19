@@ -1,5 +1,5 @@
 // const int MAX_TRA = 26; //number of transitions
-// char normalize(char c) { //normalize `c` in [0, ..., MAX_TRA-1]
+// int normalize(char c) { //normalize `c` in [0, ..., MAX_TRA-1]
 //     return c - 'a';
 // }
 
@@ -28,8 +28,8 @@ struct SuffixAutomaton {
         len.reserve(2*n);
     }
 
-    void add(char c) {
-        c = normalize(c);
+    void add(char cc) {
+        int c = normalize(cc);
         int p, cur = insert(len[last]+1, -2);
         for(p = last; p != -1 && aut[p][c] == -1; p = link[p]) {
             aut[p][c] = cur;
