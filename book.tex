@@ -10,7 +10,7 @@
 \usepackage{xtab}
 \usepackage{multirow}
 
-\xentrystretch{0}
+\xentrystretch{-0.1}
 
 \usepackage{pifont}
 
@@ -74,6 +74,9 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \algorithm{comp.sh}
 \lstinputlisting[language=bash]{src/precontest/comp.sh}
 
+\algorithm{mktests.sh}
+\lstinputlisting[language=bash]{src/precontest/mktests.sh}
+
 \algorithm{template.cpp}
 \lstinputlisting{src/precontest/template.cpp}
 
@@ -89,7 +92,7 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \algorithm{Inverses modulo $p$ of $\{1, \dots, N\}$ - $O(N)$}
 \lstinputlisting{src/math/invmod_range.cpp}
 
-\algorithm{Field $\mathbb F_p$ or group $\mathbb Z/n\mathbb Z$}
+\algorithm{Field $\mathbb F_p$ or group $\mathbb Z/p\mathbb Z$}
 \lstinputlisting{src/math/Fp.cpp}
 
 \algorithm{FFT / NTT / Polynomial multiplication - $O(n \log n)$}
@@ -131,6 +134,9 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \algorithm{$n$th term of linear reccurence of order $k$ - $O(k^2 \log(n))$}
 \lstinputlisting{src/math/linear_reccurence.cpp}
 
+\algorithm{2d geometry}
+\lstinputlisting{ut_src/2dgeometry.cpp}
+
 \algosection{String processing}
 \label{string}
 
@@ -157,6 +163,9 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 
 \algorithm{Palindromic tree - $O(n)$}
 \lstinputlisting{src/string/palindromic_tree.cpp}
+
+\algorithm{String hash}
+\lstinputlisting{ut_src/hash.cpp}
 
 \algosection{Data structures}
 \label{datastruct}
@@ -191,6 +200,12 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \algorithm{LogVector / Implicit Cartesian Tree - everything in $O(\log n)$}
 \lstinputlisting{src/datastruct/logvector.cpp}
 
+\algorithm{Convex hull trick}
+\lstinputlisting{ut_src/cht.cpp}
+
+\algorithm{Monotonic queue}
+\lstinputlisting{ut_src/monotonic_queue.cpp}
+
 \algosection{Flows}
 \label{flows}
 
@@ -200,9 +215,11 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \algorithm{Dinic - $O(V^2 E)$}
 \lstinputlisting{src/flow/dinic.cpp}
 
-\algorithm{Capacity Scaling - $O(E^2 \log(C))$ ($C$ = capacité max)}
-\lstinputlisting{src/flow/cap_scaling.cpp}
+% \algorithm{Capacity Scaling - $O(E^2 \log(C))$ ($C$ = capacité max)}
+% \lstinputlisting{src/flow/cap_scaling.cpp}
 
+\algorithm{Min-cost max-flow}
+\lstinputlisting{ut_src/mcmf.cpp}
 
 
 \algosection{Graphs}
@@ -223,6 +240,9 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \algorithm{Dominator Tree}
 \lstinputlisting{src/graph/dominator_tree.cpp}
 
+\algorithm{Directed minimum spanning tree}
+\lstinputlisting{ut_src/dmst.cpp}
+
 \algosection{Trees}
 \label{trees}
 
@@ -235,6 +255,9 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 \algorithm{Heavy-Light decomposition - $O(n)$ build, $O(\log n)$ LCA}
 \lstinputlisting{src/tree/heavy_light.cpp}
 
+\algorithm{Centroid decomposition - $O(n \log n)$ build}
+\lstinputlisting{ut_src/centroid.cpp}
+
 
 \algosection{Misc}
 \label{misc}
@@ -244,6 +267,9 @@ Notation: \verb#v[i:j]# = \verb#[v[i], v[i+1], ..., v[j-1]]# (like Python)
 
 \algorithm{Size of LIS - $O(n \log n)$}
 \lstinputlisting{src/misc/lis_short.cpp}
+
+\algorithm{2-SAT - $O(n)$}
+\lstinputlisting{ut_src/2sat.cpp}
 
 \algosection{Math formulas}
 \label{mathformulas}

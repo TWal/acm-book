@@ -38,7 +38,8 @@ struct Hash {
     // [off, ..., off+len-1]
     HashT get(int off, int len) {
         HashT ans;
-        FOR(k, nmod) ans[k] = ((preh[off + len][k] - preh[off][k] * powh[len][k]) % mods[k] + mods[k]) % mods[k];
+        FOR(k, nmod) ans[k] = ((preh[off + len][k] - preh[off][k] * powh[len][k])
+                              % mods[k] + mods[k]) % mods[k];
         return ans;
     }
 

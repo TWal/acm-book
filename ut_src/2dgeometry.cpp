@@ -13,7 +13,9 @@ struct Pt {
     Pt operator * (T k) const { return Pt(k * x, k * y); }
     Pt operator / (T k) const { return Pt(x / k, y / k); }
 
-    bool operator == (Pt p) const { return fabs(x - p.x) < eps && fabs(y - p.y) < eps; }
+    bool operator == (Pt p) const {
+        return fabs(x - p.x) < eps && fabs(y - p.y) < eps;
+    }
 };
 
 T dot(Pt a, Pt b) { return a.x * b.x + a.y * b.y; }
@@ -22,10 +24,14 @@ T dist2(Pt a, Pt b) { return dot(a - b, a - b); }
 // atan2l for long double
 T angle(Pt a, Pt b) { return atan2(cross(a, b), dot(a, b)); }
 // rotate a by t radians counter-clockwise
-Pt rotateccw(Pt a, T t) { return Pt(a.x * cos(t) - a.y * sin(t), a.x * sin(t) + a.y * cos(t)); }
+Pt rotateccw(Pt a, T t) {
+    return Pt(a.x * cos(t) - a.y * sin(t), a.x * sin(t) + a.y * cos(t));
+}
 
 // Project c on (ab) (a != b)
-Pt project_on_line(Pt a, Pt b, Pt c) { return a + (b - a) * dot(c - a, b - a) / dist2(a, b); }
+Pt project_on_line(Pt a, Pt b, Pt c) {
+    return a + (b - a) * dot(c - a, b - a) / dist2(a, b);
+}
 // Project c on [a,b] (a != b)
 Pt project_on_segment(Pt a, Pt b, Pt c) {
     T t = dot(c - a, b - a) / dist2(a, b);
@@ -52,7 +58,7 @@ bool lines_equal(Pt a, Pt b, Pt c, Pt d) {
 // [ab] and [cd] intersect?
 bool segments_intersect(Pt a, Pt b, Pt c, Pt d) {
     if (lines_equal(a, b, c, d))
-        return dot(c - a, c - b) < eps || dot(d - a, d - b) < eps || dot(c - b, d - b) < eps;
+        return dot(c-a, c-b) < eps || dot(d-a, d-b) < eps || dot(c-b, d-b) < eps;
     if (strictly_same_sign(cross(b - a, c - a), cross(b - a, d - a))) return false;
     if (strictly_same_sign(cross(d - c, a - c), cross(d - c, b - c))) return false;
     return true;
@@ -66,10 +72,12 @@ Pt lines_intersection(Pt a, Pt b, Pt c, Pt d) {
 // a,b,c should not be colinear
 Pt circle_center(Pt a, Pt b, Pt c) {
     Pt p = (a + b) / 2, q = (a + c) / 2;
-    return lines_intersection(p, p + rotateccw(b - a, pi / 2), q, q + rotateccw(c - a, pi / 2));
+    return lines_intersection(p, p + rotateccw(b - a, pi / 2),
+                              q, q + rotateccw(c - a, pi / 2));
 }
 
-// Returns 1 if a is in the interior of p, 0 in the exterior and 0 or 1 on the boundary
+// Returns 1 if a is in the interior of p, 0 in the exterior
+// and 0 or 1 on the boundary
 bool in_polygon(vector<Pt> p, Pt a) {
     int n = p.size(), is = 0;
     FOR(i, n) {
@@ -82,7 +90,9 @@ bool in_polygon(vector<Pt> p, Pt a) {
 // Returns 1 if point is on the boundary of p, 0 otherwise
 bool on_polygon(vector<Pt> p, Pt a) {
     int n = p.size();
-    FOR(i, n) if (dist2(a, project_on_segment(p[i], p[(i + 1) % n], a)) < eps) return true;
+    FOR(i, n) if (dist2(a, project_on_segment(p[i], p[(i + 1) % n], a)) < eps) {
+        return true;
+    }
     return false;
 }
 
@@ -95,7 +105,9 @@ vector<Pt> circle_line_intersection(Pt a, Pt b, Pt c, T r) {
     e = sqrt(fabs(e));
     int sgn = d.y > -eps ? +1 : -1;
     ans.pb(c + Pt(D * d.y + sgn * d.x * e, -D * d.x + fabs(d.y) * e) / dot(d, d));
-    if (e > eps) ans.pb(c + Pt(D * d.y - sgn * d.x * e, -D * d.x - fabs(d.y) * e) / dot(d, d));
+    if (e > eps) {
+        ans.pb(c + Pt(D*d.y - sgn*d.x*e, -D*d.x - fabs(d.y)*e) / dot(d, d));
+    }
     return ans;
 }
 
@@ -136,7 +148,9 @@ bool poly_simple(vector<Pt> p) {
     int n = p.size();
     FOR(i, n) FORU(k, i + 1, n) {
         int j = (i + 1) % n, l = (k + 1) % n;
-        if (i != l && j != k && segments_intersect(p[i], p[j], p[k], p[k])) return false;
+        if (i != l && j != k && segments_intersect(p[i], p[j], p[k], p[k])) {
+            return false;
+        }
     }
     return true;
 }
@@ -150,8 +164,10 @@ vector<Pt> convex_hull(vector<Pt> p) {
         auto s = h.size();
         for (Pt a: p) {
             // < eps -> < -eps to include points on the boundary
-            while (h.size() >= s + 2 && cross(h[SZ(h) - 1] - h[SZ(h) - 2], a - h[SZ(h) - 2]) < eps)
+            while (h.size() >= s + 2
+              && cross(h[SZ(h) - 1] - h[SZ(h) - 2], a - h[SZ(h) - 2]) < eps) {
                 h.pop_back();
+            }
             h.pb(a);
         }
         h.pop_back(); reverse(p.begin(), p.end());
@@ -169,8 +185,10 @@ vector<Pt> other_convex_hull(vector<Pt> p) {
     vector<Pt> h;
     for (Pt a: p) {
         // < eps -> < -eps to include points on the boundary
-        while (h.size() >= 2 && cross(h[SZ(h) - 1] - h[SZ(h) - 2], a - h[SZ(h) - 2]) < eps)
+        while (h.size() >= 2
+          && cross(h[SZ(h) - 1] - h[SZ(h) - 2], a - h[SZ(h) - 2]) < eps) {
             h.pop_back();
+        }
         h.pb(a);
     }
     return h;

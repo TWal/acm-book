@@ -23,7 +23,7 @@ void count(int u, int d = 1, int p = -1) {
 
 void work(int u) {
     cnt[0] = 1;
-    for (int v: adj[u]) mark(v, +1, 1); 
+    for (int v: adj[u]) mark(v, +1, 1);
     ans += cnt[k];
     for (int v: adj[u]) {
         mark(v, -1, 1);
@@ -46,7 +46,11 @@ void build(int u) {
     int sz = sub[u], p = -1;
     while (true) {
         int maxv = -1;
-        for (int v: adj[u]) if (v != p && !center[v] && (maxv == -1 || sub[v] > sub[maxv])) maxv = v;
+        for (int v: adj[u]) {
+            if (v != p && !center[v] && (maxv == -1 || sub[v] > sub[maxv])) {
+                maxv = v;
+            }
+        }
         if (maxv == -1 || sub[maxv] <= sz / 2) break;
         p = u;
         u = maxv;

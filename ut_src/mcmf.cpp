@@ -10,10 +10,12 @@ struct MCMF_DFS {
         curr = seen = pi = vi(N);
     }
 
-    // u -> v (c, w)
+    // u -> v (c, w). c = capacity, w = cost (weight)
     int add(int u, int v, lli c, lli w) {
-        adj.pb(v); flow.pb(0); cap.pb(c); cost.pb(+w); ne.pb(last[u]); last[u] = M++;
-        adj.pb(u); flow.pb(0); cap.pb(0); cost.pb(-w); ne.pb(last[v]); last[v] = M++;
+        adj.pb(v); flow.pb(0); cap.pb(c);
+        cost.pb(+w); ne.pb(last[u]); last[u] = M++;
+        adj.pb(u); flow.pb(0); cap.pb(0);
+        cost.pb(-w); ne.pb(last[v]); last[v] = M++;
         return M - 2;
     }
 
@@ -57,7 +59,9 @@ struct MCMF_DFS {
             lli inc = INF;
             FOR(u, N) if (seen[u]) for (int e = last[u]; e != -1; e = ne[e])  {
                 int v = adj[e];
-                if (flow[e] < cap[e] && !seen[v]) inc = min(inc, pi[v] + cost[e] - pi[u]);
+                if (flow[e] < cap[e] && !seen[v]) {
+                    inc = min(inc, pi[v] + cost[e] - pi[u]);
+                }
             }
             if (inc == INF) break;
             FOR(u, N) if (seen[u]) pi[u] += inc;
@@ -72,14 +76,16 @@ struct MCMF_Dijkstra {
     int N, M;
 
     MCMF_Dijkstra(int N) : N(N), M(0) {
-        last = vi(N, -1); 
+        last = vi(N, -1);
         how = dist = pi = vi(N);
     }
 
-    // u -> v (c, w)
+    // u -> v (c, w). c = capacity, w = cost (weight)
     int add(int u, int v, lli c, lli w) {
-        from.pb(u); adj.pb(v); flow.pb(0); cap.pb(c); cost.pb(+w); ne.pb(last[u]); last[u] = M++;
-        from.pb(v); adj.pb(u); flow.pb(0); cap.pb(0); cost.pb(-w); ne.pb(last[v]); last[v] = M++;
+        from.pb(u); adj.pb(v); flow.pb(0); cap.pb(c);
+        cost.pb(+w); ne.pb(last[u]); last[u] = M++;
+        from.pb(v); adj.pb(u); flow.pb(0); cap.pb(0);
+        cost.pb(-w); ne.pb(last[v]); last[v] = M++;
         return M - 2;
     }
 
@@ -132,15 +138,3 @@ struct MCMF_Dijkstra {
         return mt(answ, ansf);
     }
 };
-
-// Example of use
-int main() {
-    int N, M; scanf("%d%d", &N, &M);
-    MCMF_DFS mcmf(N);
-    FOR(i, M) {
-        int u, v, c, w; scanf("%d%d%d%d", &u, &v, &c, &w); u--; v--;
-        mcmf.add(u, v, c, w);
-    }
-    printf("%lld\n", X(mcmf.mcmf(0, N - 1)));
-    return 0;
-}
