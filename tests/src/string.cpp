@@ -1,6 +1,7 @@
 #include <precontest/template.cpp>
 #include <string/kmp.cpp>
 #include <string/zfunc.cpp>
+#include <string/min_rotation.cpp>
 #include <string/ahocorasick.cpp>
 #include <string/manacher.cpp>
 
@@ -138,6 +139,20 @@ void testString() {
                 RC_ASSERT(s[z[i]] != s[i+z[i]]);
             }
         }
+    });
+
+    rc::check("min_rotation", []() {
+        string s = *getString().as("s");
+        string t = s+s;
+        lli n = s.size();
+
+        lli a = 0;
+        FOR(i, n) {
+            if(t.substr(a, n) > t.substr(i, n)) {
+                a = i;
+            }
+        }
+        RC_ASSERT(a == min_rotation(s));
     });
 
     rc::Gen<vector<string>> needlesGen = rc::gen::nonEmpty(rc::gen::container<vector<string>>(rc::gen::nonEmpty(rc::gen::scale(0.3, getString())))).as("needles");

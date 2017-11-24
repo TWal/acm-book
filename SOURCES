@@ -18,6 +18,7 @@ math/linear_reccurence.cpp: own implementation
 math/polynom_euclid.cpp: own implementation
 string/kmp.cpp: http://www.iti.fh-flensburg.de/lang/algorithmen/pattern/kmpen.htm
 string/zfunc.cpp: https://github.com/stjepang/snippets/blob/master/z_algorithm.cpp
+string/min_rotation.cpp: https://github.com/stjepang/snippets/blob/master/min_rotation.cpp
 string/ahocorasick.cpp: original paper (http://cr.yp.to/bib/1975/aho.pdf)
 string/suffixautomaton.cpp: http://e-maxx.ru/algo/suffix_automata using https://translate.yandex.com/
 string/suffixarray.cpp: http://web.stanford.edu/class/cs97si/suffix-array.pdf https://github.com/antonkov/ITMOTeamBook/blob/master/string/suffix_array.cpp

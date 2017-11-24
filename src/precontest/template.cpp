@@ -16,8 +16,6 @@
 #define fst first
 #define snd second
 
-
-
 using namespace std;
 using lli = long long int;
 using llu = unsigned long long int;
@@ -32,27 +30,3 @@ using vvii  = vector<vii>;
 using vviii = vector<viii>;
 using vb    = vector<bool>;
 using vvb   = vector<vb>;
-
-
-
-template<class A, class B>
-ostream& operator<<(ostream& s, tuple<A, B> const& a){
-  return s << "(" << X(a) << "," << Y(a) << ")";
-}
-
-template<class T>
-ostream& print_collection(ostream& s, T const& a){
-  for(auto it = begin(a); it != end(a); ++it) {
-    s << *it; if(next(it) != end(a)) s << " ";
-  }
-  return s;
-}
-
-template<class T>
-ostream& operator<<(ostream& s, vector<T> const& a) {
-    return print_collection(s, a);
-}
-template<class T>
-ostream& operator<<(ostream& s, set<T> const& a) {
-    return print_collection(s, a);
-}
