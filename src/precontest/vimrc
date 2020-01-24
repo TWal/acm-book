@@ -13,6 +13,7 @@ set hls "hlsearch
 set is "incsearch
 set ttm=100 " Don't wait when doing <Esc>O, ttimeoutlen
 set so=5 " 5 line above / below the cursor when scrolling, scrolloff
+set mouse=a " enable mouse
 xnoremap < <gv
 xnoremap > >gv
 noremap 0 ^
